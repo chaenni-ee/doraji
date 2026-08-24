@@ -14,18 +14,33 @@
   --ink: #4a4458;
   --card-radius: 26px;
   --shadow: 0 10px 24px rgba(140, 100, 130, 0.12);
+  font-size: 16px;
+}
+
+/* 데스크톱/노트북 화면(기본 사용 환경)에서 더 여유롭고 잘 읽히도록 기준 크기를 키운다 */
+@media (min-width: 900px) {
+  :root {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1300px) {
+  :root {
+    font-size: 19px;
+  }
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: 'Gowun Dodum', 'Apple SD Gothic Neo', sans-serif;
+  font-family: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   color: var(--ink);
   background: linear-gradient(160deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3 {
-  font-family: 'Jua', 'Gowun Dodum', sans-serif;
+  font-family: 'Jua', 'Pretendard Variable', Pretendard, sans-serif;
   margin: 0;
 }
 
@@ -33,6 +48,13 @@ h1, h2, h3 {
   max-width: 920px;
   margin: 0 auto;
   padding: 32px 20px 100px;
+}
+
+@media (min-width: 900px) {
+  .app {
+    max-width: 1080px;
+    padding: 48px 32px 120px;
+  }
 }
 
 .hero {
@@ -54,6 +76,13 @@ h1, h2, h3 {
   text-align: center;
   box-shadow: var(--shadow);
   margin-bottom: 24px;
+}
+
+@media (min-width: 900px) {
+  .today-card {
+    padding: 40px 48px;
+    margin-bottom: 32px;
+  }
 }
 
 .today-line {
@@ -108,6 +137,7 @@ h1, h2, h3 {
 .cards-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: start;
   gap: 20px;
 }
 
@@ -117,10 +147,22 @@ h1, h2, h3 {
   }
 }
 
+@media (min-width: 900px) {
+  .cards-row {
+    gap: 28px;
+  }
+}
+
 .card {
   border-radius: var(--card-radius);
   padding: 24px 22px;
   box-shadow: var(--shadow);
+}
+
+@media (min-width: 900px) {
+  .card {
+    padding: 30px 28px;
+  }
 }
 
 .card h2 {
@@ -173,13 +215,14 @@ h1, h2, h3 {
 
 .participants-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
   gap: 10px;
 }
 
-@media (max-width: 420px) {
+@media (min-width: 900px) {
   .participants-grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
+    gap: 14px;
   }
 }
 
@@ -201,6 +244,7 @@ h1, h2, h3 {
 
 .participant-btn:hover {
   transform: scale(1.08);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.14);
 }
 
 .participant-btn:active {
