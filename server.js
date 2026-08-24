@@ -28,7 +28,44 @@ function defaultState() {
   };
 }
 
-function loadState() {
+function normalizeState(parsed) {
+  const fallback = defaultState();
+  if (!parsed) return fallback;
+  return {
+    date: parsed.date ?? fallback.date,
+    schedule: { ...fallback.schedule, ...(parsed.schedule || {}) },
+    participants:
+      Array.isArray(parsed.participants) && parsed.participants.length === STUDENT_COUNT
+        ? parsed.participants
+        : fallback.participants,
+  };
+}
+
+// Render 같은 무료 호스팅은 서버가 쉬었다 깨어날 때 로컬 파일이 초기화될 수 있으므로,
+// SUPABASE_URL/SUPABASE_SERVICE_KEY가 설정되어 있으면 Supabase(DB)에 영구 저장하고,
+// 없으면(로컬 개발) 기존처럼 파일에 저장한다.
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const useSupabase = Boolean(SUPABASE_URL && SUPABASE_SERVICE_KEY);
+
+let supabase = null;
+if (useSupabase) {
+  const { createClient } = require('@supabase/supabase-js');
+  supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+}
+
+async function loadState() {
+  if (useSupabase) {
+    const { data, error } = await supabase.from('app_state').select('data').eq('id', 'main').maybeSingle();
+    if (error) throw error;
+    if (!data) {
+      const initial = defaultState();
+      await supabase.from('app_state').upsert({ id: 'main', data: initial });
+      return initial;
+    }
+    return normalizeState(data.data);
+  }
+
   if (!fs.existsSync(DATA_PATH)) {
     const initial = defaultState();
     fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -37,15 +74,7 @@ function loadState() {
   }
   try {
     const raw = fs.readFileSync(DATA_PATH, 'utf-8');
-    const parsed = JSON.parse(raw);
-    const fallback = defaultState();
-    return {
-      date: parsed.date ?? fallback.date,
-      schedule: { ...fallback.schedule, ...(parsed.schedule || {}) },
-      participants: Array.isArray(parsed.participants) && parsed.participants.length === STUDENT_COUNT
-        ? parsed.participants
-        : fallback.participants,
-    };
+    return normalizeState(JSON.parse(raw));
   } catch {
     const initial = defaultState();
     fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -54,7 +83,12 @@ function loadState() {
   }
 }
 
-function saveState(state) {
+async function saveState(state) {
+  if (useSupabase) {
+    const { error } = await supabase.from('app_state').upsert({ id: 'main', data: state });
+    if (error) throw error;
+    return;
+  }
   fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(DATA_PATH, JSON.stringify(state, null, 2));
 }
@@ -73,16 +107,20 @@ function kstDateString(d) {
   return `${y}-${m}-${day}`;
 }
 
-let state = loadState();
+let state = defaultState();
+let stateReady = loadState().then((loaded) => {
+  state = loaded;
+});
 
 // 날짜(KST)가 바뀌면 참여 현황을 자동으로 초기화한다.
-function ensureDailyReset() {
+async function ensureDailyReset() {
+  await stateReady;
   const kstNow = getKstNow();
   const today = kstDateString(kstNow);
   if (state.date !== today) {
     state.date = today;
     state.participants.forEach((p) => (p.done = false));
-    saveState(state);
+    await saveState(state);
   }
   return kstNow;
 }
@@ -98,33 +136,41 @@ function requireTeacher(req, res, next) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/api/state', (req, res) => {
-  const kstNow = ensureDailyReset();
-  const dayKey = DAY_KEYS[kstNow.getDay()];
-  const isWeekend = !WEEKDAY_KEYS.includes(dayKey);
-  const today = isWeekend ? null : state.schedule[dayKey];
+app.get('/api/state', async (req, res, next) => {
+  try {
+    const kstNow = await ensureDailyReset();
+    const dayKey = DAY_KEYS[kstNow.getDay()];
+    const isWeekend = !WEEKDAY_KEYS.includes(dayKey);
+    const today = isWeekend ? null : state.schedule[dayKey];
 
-  res.json({
-    date: state.date,
-    dayKey,
-    dayLabel: DAY_LABELS[dayKey],
-    isWeekend,
-    today,
-    schedule: state.schedule,
-    participants: state.participants,
-  });
+    res.json({
+      date: state.date,
+      dayKey,
+      dayLabel: DAY_LABELS[dayKey],
+      isWeekend,
+      today,
+      schedule: state.schedule,
+      participants: state.participants,
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
-app.post('/api/participants/:no/toggle', (req, res) => {
-  ensureDailyReset();
-  const no = Number(req.params.no);
-  const participant = state.participants.find((p) => p.no === no);
-  if (!participant) {
-    return res.status(404).json({ error: '존재하지 않는 번호입니다.' });
+app.post('/api/participants/:no/toggle', async (req, res, next) => {
+  try {
+    await ensureDailyReset();
+    const no = Number(req.params.no);
+    const participant = state.participants.find((p) => p.no === no);
+    if (!participant) {
+      return res.status(404).json({ error: '존재하지 않는 번호입니다.' });
+    }
+    participant.done = !participant.done;
+    await saveState(state);
+    res.json({ participants: state.participants });
+  } catch (err) {
+    next(err);
   }
-  participant.done = !participant.done;
-  saveState(state);
-  res.json({ participants: state.participants });
 });
 
 app.post('/api/teacher/login', (req, res) => {
@@ -146,25 +192,40 @@ app.post('/api/teacher/logout', requireTeacher, (req, res) => {
   res.json({ ok: true });
 });
 
-app.put('/api/teacher/schedule/:day', requireTeacher, (req, res) => {
-  const day = req.params.day;
-  if (!state.schedule[day]) {
-    return res.status(400).json({ error: '잘못된 요일입니다.' });
+app.put('/api/teacher/schedule/:day', requireTeacher, async (req, res, next) => {
+  try {
+    await stateReady;
+    const day = req.params.day;
+    if (!state.schedule[day]) {
+      return res.status(400).json({ error: '잘못된 요일입니다.' });
+    }
+    const { activityName, link, description } = req.body || {};
+    if (typeof activityName === 'string') state.schedule[day].activityName = activityName.trim();
+    if (typeof link === 'string') state.schedule[day].link = link.trim();
+    if (typeof description === 'string') state.schedule[day].description = description.trim();
+    await saveState(state);
+    res.json({ schedule: state.schedule });
+  } catch (err) {
+    next(err);
   }
-  const { activityName, link, description } = req.body || {};
-  if (typeof activityName === 'string') state.schedule[day].activityName = activityName.trim();
-  if (typeof link === 'string') state.schedule[day].link = link.trim();
-  if (typeof description === 'string') state.schedule[day].description = description.trim();
-  saveState(state);
-  res.json({ schedule: state.schedule });
 });
 
-app.post('/api/teacher/reset', requireTeacher, (req, res) => {
-  state.participants.forEach((p) => (p.done = false));
-  saveState(state);
-  res.json({ participants: state.participants });
+app.post('/api/teacher/reset', requireTeacher, async (req, res, next) => {
+  try {
+    await stateReady;
+    state.participants.forEach((p) => (p.done = false));
+    await saveState(state);
+    res.json({ participants: state.participants });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: '서버 오류가 발생했습니다.' });
 });
 
 app.listen(PORT, () => {
-  console.log(`서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
+  console.log(`서버가 http://localhost:${PORT} 에서 실행 중입니다. (저장 방식: ${useSupabase ? 'Supabase' : '로컬 파일'})`);
 });

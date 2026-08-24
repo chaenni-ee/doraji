@@ -27,7 +27,23 @@ TEACHER_PASSWORD="원하는_비밀번호" npm start
 
 ## 데이터 저장
 
-요일별 활동 설정과 참여 현황은 `data/state.json` 파일에 저장됩니다(최초 실행 시 자동 생성). 이 파일은 서버가 계속 실행되는 환경(예: 개인 서버, Railway, Render 등 파일 시스템이 유지되는 호스팅)에 배포해야 데이터가 유지됩니다. 서버리스 환경(예: Vercel)에서는 재배포/재시작 시 데이터가 초기화될 수 있습니다.
+- 기본값: 요일별 활동 설정과 참여 현황이 `data/state.json` 파일에 저장됩니다(로컬 개발용). Render 무료 요금제처럼 서버가 주기적으로 재시작되는 환경에서는 이 파일이 재시작 때마다 초기화될 수 있습니다.
+- **`SUPABASE_URL`, `SUPABASE_SERVICE_KEY` 환경변수를 설정하면** 파일 대신 Supabase(무료 데이터베이스)에 저장되어, 서버가 재시작돼도 데이터가 유지됩니다. 배포 환경에서는 이 방식을 권장합니다.
+
+### Supabase 연동 방법 (무료)
+
+1. https://supabase.com 에서 무료 계정 생성 후 새 프로젝트 생성
+2. 프로젝트의 **SQL Editor**에서 아래 쿼리를 실행해 테이블 생성:
+   ```sql
+   create table app_state (
+     id text primary key,
+     data jsonb not null
+   );
+   ```
+3. 프로젝트 설정 **Project Settings → API**에서 다음 두 값을 확인:
+   - **Project URL** → `SUPABASE_URL`
+   - **service_role secret key** → `SUPABASE_SERVICE_KEY` (anon key 아님, 외부에 노출되지 않도록 주의)
+4. 배포 환경(Render 등)의 환경변수에 위 두 값을 추가
 
 ## 배포 팁
 
