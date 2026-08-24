@@ -1,0 +1,14 @@
+{
+  "name": "class-morning-routine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "우리 반 아침 활동 안내 및 참여 현황 웹앱",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

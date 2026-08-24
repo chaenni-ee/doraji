@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>행복과 웃음이 넘치는 우리 반</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <h1>❤️ 행복과 웃음이 넘치는 우리 반 ❤️</h1>
+    </header>
+
+    <section class="today-card" id="todayCard">
+      <p class="today-line">
+        오늘의 아침 활동은
+        <span class="activity-name" id="activityName">불러오는 중...</span>
+        입니다.
+      </p>
+      <div class="link-row" id="linkRow" hidden>
+        <span class="link-label">접속 링크</span>
+        <span>🔗</span>
+        <a id="activityLink" class="activity-link" href="#" target="_blank" rel="noopener noreferrer">바로가기</a>
+      </div>
+      <p class="today-desc" id="todayDesc" hidden></p>
+      <p class="weekend-msg" id="weekendMsg" hidden>🌈 주말에는 아침 활동이 없어요! 푹 쉬고 월요일에 만나요.</p>
+    </section>
+
+    <section class="cards-row">
+      <div class="card card-pink">
+        <h2># 우리 반 아침 활동 목록</h2>
+        <ul class="schedule-list" id="scheduleList">
+          <li>불러오는 중...</li>
+        </ul>
+      </div>
+
+      <div class="card card-yellow">
+        <h2># 우리 반 아침 활동 참여 현황</h2>
+        <p class="hint">번호를 누르면 완료 표시가 돼요!</p>
+        <div class="participants-grid" id="participantsGrid"></div>
+        <p class="progress" id="progressText"></p>
+      </div>
+    </section>
+
+    <footer class="date-footer" id="dateFooter"></footer>
+  </div>
+
+  <button class="teacher-fab" id="teacherFab" title="교사 모드">🔒 교사 모드</button>
+
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+
+      <div id="loginView">
+        <h3>🔑 교사 모드 로그인</h3>
+        <p class="modal-desc">비밀번호를 입력하면 요일별 아침 활동, 접속 링크, 부가 설명을 설정할 수 있어요.</p>
+        <input type="password" id="passwordInput" class="text-input" placeholder="비밀번호" />
+        <p class="error-msg" id="loginError" hidden></p>
+        <button class="primary-btn" id="loginBtn">로그인</button>
+      </div>
+
+      <div id="editView" hidden>
+        <h3>🛠 요일별 아침 활동 설정</h3>
+        <div class="day-tabs" id="dayTabs"></div>
+        <div id="dayForm">
+          <label>활동 이름</label>
+          <input type="text" id="editActivityName" class="text-input" placeholder="예: 영어 단어 랭킹 게임" />
+          <label>접속 링크</label>
+          <input type="url" id="editLink" class="text-input" placeholder="https://..." />
+          <label>부가 설명</label>
+          <textarea id="editDescription" class="text-input" rows="3" placeholder="학생들에게 전달할 안내사항을 적어주세요."></textarea>
+          <button class="primary-btn" id="saveDayBtn">이 요일 저장하기</button>
+          <p class="save-msg" id="saveMsg" hidden></p>
+        </div>
+        <hr />
+        <button class="secondary-btn" id="resetBtn">🔄 오늘 참여 현황 초기화</button>
+        <button class="logout-btn" id="logoutBtn">로그아웃</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
