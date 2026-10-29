@@ -18,6 +18,8 @@
   --line-soft:#C9CEC6;
   --accent:#2C4A7A;      /* 쪽빛 */
   --accent-ink:#FFFFFF;
+  --submit:#B4470F;      /* 진한 주황 */
+  --submit-ink:#FFFFFF;
   --blank:#E7C766;       /* 교과서 빈칸 색(치자) */
   --blank-soft:#F3E3AE;
   --now:#BFD3F2;
@@ -36,7 +38,7 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#141719;--sheet:#1D2124;--ink:#E7E9E3;--muted:#A2AAA4;--line:#59615C;--line-soft:#353B3E;
-    --accent:#93AEE0;--accent-ink:#10151C;--blank:#B8973A;--blank-soft:#4A3F1E;--now:#2E4A75;
+    --accent:#93AEE0;--accent-ink:#10151C;--submit:#E07B39;--submit-ink:#1A0E05;--blank:#B8973A;--blank-soft:#4A3F1E;--now:#2E4A75;
     --warn:#EE8F7B;--warn-bg:#4A2620;--ok:#7CCBA2;--ok-bg:#1E3A2C;--chipL:26%;--chipS:38%;--barL:62%;
     --shadow:0 1px 0 rgba(0,0,0,.4),0 6px 18px -10px rgba(0,0,0,.8);
     color-scheme:dark;
@@ -44,7 +46,7 @@
 }
 :root[data-theme="dark"]{
   --bg:#141719;--sheet:#1D2124;--ink:#E7E9E3;--muted:#A2AAA4;--line:#59615C;--line-soft:#353B3E;
-  --accent:#93AEE0;--accent-ink:#10151C;--blank:#B8973A;--blank-soft:#4A3F1E;--now:#2E4A75;
+  --accent:#93AEE0;--accent-ink:#10151C;--submit:#E07B39;--submit-ink:#1A0E05;--blank:#B8973A;--blank-soft:#4A3F1E;--now:#2E4A75;
   --warn:#EE8F7B;--warn-bg:#4A2620;--ok:#7CCBA2;--ok-bg:#1E3A2C;--chipL:26%;--chipS:38%;--barL:62%;
   --shadow:0 1px 0 rgba(0,0,0,.4),0 6px 18px -10px rgba(0,0,0,.8);
   color-scheme:dark;
@@ -174,11 +176,15 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
 .perform label{display:inline-flex;gap:6px;align-items:center;font-size:15px;cursor:pointer}
 .perform input{accent-color:var(--accent);width:18px;height:18px}
 .submit-box{display:grid;gap:10px;padding-top:4px}
-.submit-row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.submit-row{display:flex;flex-wrap:wrap-reverse;gap:8px 14px;align-items:center;justify-content:flex-end}
+.submit-row .submit-msg{flex:1 1 14em;text-align:right}
+.btn.submit{background:var(--submit);border-color:var(--submit);color:var(--submit-ink);font-size:17px;padding:11px 26px;box-shadow:0 2px 0 color-mix(in srgb,var(--submit) 60%,#000)}
+.btn.submit:hover{filter:brightness(1.08)}
+.btn.submit:active{transform:translateY(1px)}
 .submit-msg{font-size:14px;font-weight:700;margin:0}
 .submit-msg.ok{color:var(--ok)}
 .submit-msg.no{color:var(--warn)}
-.submit-help{font-size:13px;color:var(--muted)}
+.submit-help{font-size:13px;color:var(--muted);text-align:right}
 .foot a{color:var(--accent)}
 @media (max-width:520px){.me-fields{grid-template-columns:repeat(3,minmax(0,1fr))}.me-fields .wide{grid-column:1/-1}}
 .btn:disabled{opacity:.5;cursor:default}
@@ -289,10 +295,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
         <span class="me-tag" id="meTag"></span>
       </div>
       <div class="line-out" id="lineOut"></div>
-      <div class="btns">
-        <button class="btn" id="copyBtn" type="button">율명과 가사 복사하기</button>
-        <span class="copy-note" id="copyNote"></span>
-      </div>
       <div class="submit-box" id="submitBox">
         <fieldset class="perform">
           <legend>발표 방법</legend>
@@ -301,12 +303,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
           <label><input type="radio" name="perform" value="단소+노래"> 둘 다</label>
         </fieldset>
         <div class="submit-row">
-          <button class="btn primary" id="submitBtn" type="button">선생님께 제출하기</button>
           <span class="submit-msg" id="submitMsg" role="status"></span>
+          <button class="btn submit" id="submitBtn" type="button">선생님께 제출하기</button>
         </div>
         <p class="submit-help" id="submitHelp"></p>
       </div>
-      <textarea id="copyFallback" hidden readonly rows="4" style="width:100%;font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px"></textarea>
     </div>
   </section>
 
@@ -729,18 +730,6 @@ function renderMe(){
 }
 whoEl.addEventListener('input',renderMe);
 renderMe();
-
-document.getElementById('copyBtn').addEventListener('click',()=>{
-  const syl=['저','기'].concat(SYL), ns=['潢','汰'].concat(picks);
-  const txt = '나만의 도라지타령 마지막 줄'+(who?' — '+who:'')+'\n'+
-    syl.map((s,i)=>s+'('+(ns[i]?BY[ns[i]].hg:'?')+')').join(' ')+'\n'+
-    '율명: '+ns.map(k=>k?BY[k].hg:'?').join(' ');
-  const note=document.getElementById('copyNote'), fb=document.getElementById('copyFallback');
-  const fallback=()=>{ fb.hidden=false; fb.value=txt; fb.focus(); fb.select(); note.textContent='아래 글을 길게 눌러 복사하세요.'; };
-  try{
-    navigator.clipboard.writeText(txt).then(()=>{ note.textContent='복사했어요. 학급 게시판이나 활동지에 붙여 넣으세요.'; fb.hidden=true; }, fallback);
-  }catch(e){ fallback(); }
-});
 
 document.addEventListener('keydown',e=>{
   if(e.target.matches('input,textarea')||e.metaKey||e.ctrlKey||e.altKey) return;
