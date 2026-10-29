@@ -547,6 +547,7 @@ function startPlay(btn, rowIdx, usePicks){
 }
 
 /* ---------- 조건 검사 ---------- */
+function isOriginal(){ return picks.every((k,i)=>k===ORIGINAL[i]); }
 function prevNote(b){ return b===0 ? '汰' : picks[b-1]; }
 function badAt(b){
   const p=prevNote(b), n=picks[b];
@@ -629,10 +630,12 @@ function renderSide(){
     const k=el.dataset.k;
     el.classList.toggle('far', !!(p && Math.abs(BY[p].i-BY[k].i)>1));
   });
-  const allOk = filled===N && bads.length===0;
+  const same = isOriginal();
+  const allOk = filled===N && bads.length===0 && !same;
   document.getElementById('rules').innerHTML =
     '<li><span class="pill '+(filled===N?'ok':'')+'">'+filled+' / '+N+'</span>빈칸 하나에 율명 하나씩, 12칸을 모두 채워요.</li>'+
     '<li><span class="pill '+(bads.length?'no':(filled?'ok':''))+'">'+(bads.length?'고쳐요':(filled?'좋아요':'대기'))+'</span>같은 음이나 바로 위·아래 음으로만 움직여요.</li>'+
+    '<li><span class="pill '+(filled===N?(same?'no':'ok'):'')+'">'+(filled===N?(same?'바꿔요':'좋아요'):'대기')+'</span>원래 도라지타령과 다른 가락으로 바꿔요. (원래 가락 그대로는 제출할 수 없어요)</li>'+
     '<li><span class="pill '+(allOk?'ok':'')+'">'+(allOk?'완성':'—')+'</span>다 채우면 ③에서 전체 노래를 들어 봐요.</li>';
   document.getElementById('warns').innerHTML = bads.map(b=>{
     const a=prevNote(b), n=picks[b];
@@ -767,6 +770,7 @@ submitBtn.addEventListener('click',async()=>{
   if(!who) return needMe(whoEl,'맨 위에 이름을 적어 주세요.');
   const left=picks.filter(x=>!x).length;
   if(left){ setMsg(submitMsg,'빈칸이 '+left+'개 남았어요. 모두 채운 뒤 제출해요.','no'); return; }
+  if(isOriginal()){ setMsg(submitMsg,'원래 도라지타령과 똑같아요. 가락을 내 마음대로 바꾼 뒤 제출해요.','no'); return; }
   if(!perform){ setMsg(submitMsg,'발표 방법을 골라 주세요.','no'); return; }
   const rule = !picks.some((_,b)=>badAt(b));
   submitBtn.disabled=true; setMsg(submitMsg,'보내는 중…');

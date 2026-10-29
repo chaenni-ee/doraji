@@ -49,7 +49,7 @@ tr.miss td{background:var(--miss);color:var(--muted)}
 .report-head{display:none}
 @media (max-width:640px){.form{grid-template-columns:repeat(3,minmax(0,1fr))}.form .pw{grid-column:1/-1}.form .go{grid-column:1/-1}}
 @media print{
-  @page{size:A4 landscape;margin:12mm}
+  @page{size:A4 portrait;margin:14mm 12mm}
   body{background:#fff;color:#000;font-size:11pt}
   .no-print{display:none!important}
   .wrap{padding:0;max-width:none}
@@ -60,6 +60,11 @@ tr.miss td{background:var(--miss);color:var(--muted)}
   th{background:#e8ecf3!important;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   th,td{border:1px solid #000}
   tr.miss td{background:#fff;color:#000}
+  table{font-size:9.5pt;table-layout:auto}
+  th,td{padding:3pt 4pt}
+  th{white-space:normal}
+  td.melody{white-space:normal;word-break:keep-all}
+  tr{break-inside:avoid}
 }
 </style>
 <script src="config.js"></script>
@@ -69,7 +74,7 @@ tr.miss td{background:var(--miss);color:var(--muted)}
   <header class="no-print">
     <div class="eyebrow">선생님 페이지 · 음악 창작 실기평가</div>
     <h1>도라지타령 제출 기록</h1>
-    <p class="lede">학년과 반을 고르면 그 반 학생들이 제출한 가락을 볼 수 있어요. Word 파일로 내려받거나 PDF로 저장할 수 있어요. <a href="./">학생 화면으로 가기</a></p>
+    <p class="lede">학년과 반을 고르면 그 반 학생들이 제출한 가락을 볼 수 있어요. Word나 PDF로 저장할 수 있어요. <a href="./">학생 화면으로 가기</a></p>
   </header>
 
   <section class="card no-print">
@@ -93,7 +98,7 @@ tr.miss td{background:var(--miss);color:var(--muted)}
     <div class="bar no-print">
       <span class="summary" id="summary"></span>
       <div class="btns">
-        <button class="btn" type="button" id="wordBtn">Word로 내려받기</button>
+        <button class="btn" type="button" id="wordBtn">Word로 저장</button>
         <button class="btn" type="button" id="pdfBtn">PDF로 저장</button>
       </div>
     </div>
@@ -112,7 +117,7 @@ for(let i=1;i<=15;i++){ const o=document.createElement('option'); o.textContent=
 try{ $('pw').value = sessionStorage.getItem('doraji-pw')||''; }catch(e){}
 try{ const last=JSON.parse(localStorage.getItem('doraji-teacher')||'{}'); if(last.grade) $('grade').value=last.grade; if(last.cls) clsEl.value=last.cls; if(last.total) $('total').value=last.total; }catch(e){}
 
-const COLS=['번호','이름','만든 가락 (12칸)','빈칸 모두 채움','음 이동 규칙','발표 방법','제출 시각'];
+const COLS=['번호','이름','만든 가락 (12칸)','빈칸 채움','음 이동 규칙','발표 방법','제출 시각'];
 let rows=[], meta={};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ox=b=>b?'O':'X';
@@ -175,9 +180,9 @@ $('form').addEventListener('submit',async e=>{
 $('wordBtn').addEventListener('click',()=>{
   const title=esc($('reportTitle').textContent);
   const html='﻿<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>'+title+'</title>'+
-    '<style>@page Section1{size:841.9pt 595.3pt;mso-page-orientation:landscape;margin:36pt}div.Section1{page:Section1}'+
+    '<style>@page Section1{size:595.3pt 841.9pt;mso-page-orientation:portrait;margin:40pt 34pt}div.Section1{page:Section1}'+
     'body{font-family:"맑은 고딕",sans-serif;font-size:10.5pt}h1{font-size:15pt}p{margin:2pt 0;font-size:9.5pt}'+
-    'table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;padding:4pt 6pt;text-align:center;font-size:10pt}th{background:#E8ECF3}td.melody{text-align:left}</style></head>'+
+    'table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;padding:3pt 4pt;text-align:center;font-size:9pt}th{background:#E8ECF3}td.melody{text-align:left}</style></head>'+
     '<body><div class="Section1"><h1>'+title+'</h1>'+
     '<p>성취기준 [6음03-02] 기초적인 기보를 활용하여 간단한 조건에 따라 악곡의 일부를 바꾼다.</p>'+
     '<p>평가 내용: 도라지타령 마지막 줄 가락 바꾸기 (빈칸 12칸, 같은 음이나 바로 위·아래 음으로만 이동)</p><br>'+
