@@ -165,31 +165,23 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
 .syl.miss .n{color:var(--muted)}
 .copy-note{font-size:13px;color:var(--muted)}
 
-.id-fields{display:flex;flex-wrap:wrap;gap:8px 14px}
-.submit-box{display:grid;gap:6px;padding-top:4px}
+.me-fields{display:grid;grid-template-columns:repeat(3,minmax(0,8em)) minmax(0,14em);gap:10px 14px}
+.me-fields label{display:grid;gap:4px;font-size:14px;font-weight:700;color:var(--muted)}
+.me-fields select,.me-fields input{font:inherit;font-size:17px;padding:8px 10px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%;min-width:0}
+.me-tag{font-size:14px;color:var(--muted)}
+.perform{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+.perform legend{float:left;font-weight:700;font-size:14px;margin-right:6px}
+.perform label{display:inline-flex;gap:6px;align-items:center;font-size:15px;cursor:pointer}
+.perform input{accent-color:var(--accent);width:18px;height:18px}
+.submit-box{display:grid;gap:10px;padding-top:4px}
 .submit-row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
 .submit-msg{font-size:14px;font-weight:700;margin:0}
 .submit-msg.ok{color:var(--ok)}
 .submit-msg.no{color:var(--warn)}
 .submit-help{font-size:13px;color:var(--muted)}
+.foot a{color:var(--accent)}
+@media (max-width:520px){.me-fields{grid-template-columns:repeat(3,minmax(0,1fr))}.me-fields .wide{grid-column:1/-1}}
 .btn:disabled{opacity:.5;cursor:default}
-.teacher{display:block;contain:inline-size}
-.teacher[open] summary{margin-bottom:16px}
-.teacher summary{display:flex;gap:12px;align-items:center;cursor:pointer;list-style:none}
-.teacher summary::-webkit-details-marker{display:none}
-.teacher summary h2{font-size:clamp(18px,2.6vw,22px)}
-.teacher-body{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;font-size:15px;min-width:0}
-.setup{margin:0;padding-left:1.3em;display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
-.setup a{color:var(--accent)}
-.code-wrap{position:relative;margin-top:8px;min-width:0}
-.code-wrap .btn{position:absolute;top:6px;right:6px;padding:4px 12px;font-size:13px;background:var(--sheet)}
-.code-wrap pre{margin:0;max-height:220px;overflow:auto;background:var(--bg);border:1px solid var(--line-soft);border-radius:6px;padding:12px;font-size:12px;line-height:1.5}
-.setup-form{display:grid;gap:8px;min-width:0}
-.setup-form label{font-weight:700;font-size:14px}
-.setup-form input,.class-link input{font:inherit;font-size:14px;padding:8px 10px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%;min-width:0}
-.class-link{display:flex;gap:8px;align-items:center}
-.class-link input{flex:1}
-
 /* ③ 전체 */
 .player{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
 .tempo{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
@@ -225,6 +217,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+<script src="config.js"></script>
 </head>
 <body>
 
@@ -239,6 +232,19 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
   </header>
 
   <!-- ① 율명 듣기 -->
+  <section class="step me" aria-labelledby="s0">
+    <div class="step-head">
+      <span class="step-num">0</span><h2 id="s0">내 정보</h2>
+      <p>처음에 학년, 반, 번호, 이름을 적어요. 제출할 때 선생님께 이 정보가 함께 갑니다.</p>
+    </div>
+    <div class="me-fields">
+      <label for="grade">학년<select id="grade"><option value="">선택</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+      <label for="cls">반<select id="cls"><option value="">선택</option></select></label>
+      <label for="no">번호<input id="no" type="number" inputmode="numeric" min="1" max="40" placeholder="3" autocomplete="off"></label>
+      <label for="who" class="wide">이름<input id="who" type="text" maxlength="20" placeholder="김하늘" autocomplete="off"></label>
+    </div>
+  </section>
+
   <section class="step" aria-labelledby="s1">
     <div class="step-head">
       <span class="step-num">1</span><h2 id="s1">율명 소리 듣기</h2>
@@ -280,15 +286,20 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
     <div class="result">
       <div class="result-head">
         <h3>내가 만든 마지막 줄</h3>
-        <div class="id-fields"><label class="name-field" for="no">번호 <input id="no" type="number" inputmode="numeric" min="1" max="40" placeholder="3" autocomplete="off" style="width:4.5em"></label><label class="name-field" for="who">이름 <input id="who" type="text" placeholder="김하늘" autocomplete="off"></label></div>
+        <span class="me-tag" id="meTag"></span>
       </div>
       <div class="line-out" id="lineOut"></div>
       <div class="btns">
         <button class="btn" id="copyBtn" type="button">율명과 가사 복사하기</button>
-        <button class="btn quiet" id="copySheet" type="button">기록표용 복사</button>
         <span class="copy-note" id="copyNote"></span>
       </div>
       <div class="submit-box" id="submitBox">
+        <fieldset class="perform">
+          <legend>발표 방법</legend>
+          <label><input type="radio" name="perform" value="단소"> 단소로 연주</label>
+          <label><input type="radio" name="perform" value="노래"> 노래로 부르기</label>
+          <label><input type="radio" name="perform" value="단소+노래"> 둘 다</label>
+        </fieldset>
         <div class="submit-row">
           <button class="btn primary" id="submitBtn" type="button">선생님께 제출하기</button>
           <span class="submit-msg" id="submitMsg" role="status"></span>
@@ -331,36 +342,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
     </div>
   </section>
 
-  <details class="step teacher" id="teacher">
-    <summary><span class="step-num">T</span><h2>선생님 설정 · 우리 반 제출 링크 만들기</h2></summary>
-    <div class="teacher-body">
-      <p>학생이 [제출하기]를 누르면 선생님의 구글 시트 기록표에 번호 줄마다 자동으로 기록됩니다. 반마다 링크가 달라서 다른 반 기록과 섞이지 않아요. 처음 한 번만 설정하면 됩니다.</p>
-      <ol class="setup">
-        <li>구글 드라이브에서 기록표 시트를 엽니다. 기록표가 없으면 <a href="https://github.com/chaenni-ee/doraji/raw/HEAD/%EA%B8%B0%EB%A1%9D%ED%91%9C_%EC%96%91%EC%8B%9D.xlsx" target="_blank" rel="noopener">기록표 양식</a>을 내려받아 드라이브에 올린 뒤 구글 시트로 엽니다.</li>
-        <li>시트 메뉴에서 <b>확장 프로그램 → Apps Script</b>를 누르고, 원래 있던 내용을 지운 뒤 아래 코드를 붙여 넣고 저장합니다.
-          <div class="code-wrap"><button class="btn quiet" id="copyCode" type="button">코드 복사</button><pre id="gsCode"></pre></div>
-        </li>
-        <li><b>배포 → 새 배포</b>를 누르고, 유형 선택(톱니바퀴)에서 <b>웹 앱</b>을 고릅니다. <b>다음 사용자 인증 정보로 실행: 나</b>, <b>액세스 권한: 모든 사용자</b>로 두고 [배포]를 누릅니다. 권한 확인 창이 나오면 내 계정을 고르고 허용합니다.</li>
-        <li>나온 <b>웹 앱 URL</b>(https://script.google.com/macros/s/…/exec)을 아래 칸에 붙여 넣습니다.</li>
-      </ol>
-      <div class="setup-form">
-        <label for="gsUrl">웹 앱 URL</label>
-        <input id="gsUrl" type="url" placeholder="https://script.google.com/macros/s/AKfy…/exec" autocomplete="off">
-        <div class="btns">
-          <button class="btn" id="testUrl" type="button">연결 확인</button>
-          <button class="btn primary" id="makeLink" type="button">우리 반 학생용 링크 만들기</button>
-        </div>
-        <p class="submit-msg" id="setupMsg" role="status"></p>
-        <div class="class-link" id="classLinkBox" hidden>
-          <input id="classLink" type="text" readonly>
-          <button class="btn" id="copyLink" type="button">링크 복사</button>
-        </div>
-      </div>
-      <p class="foot">기록표의 ‘기록표’ 탭에서 5번째 줄이 1번 학생입니다. 같은 번호로 다시 제출하면 그 줄이 새 가락으로 바뀌고, 제출 시각이 I열에 남습니다. 다른 반 선생님께는 이 페이지 주소만 알려 드리면 됩니다. 각자 자기 시트로 이 설정을 하면 됩니다.</p>
-    </div>
-  </details>
-
-  <p class="foot">소리는 단소 음색을 흉내 낸 합성음입니다. 소리가 나지 않으면 기기의 무음 모드를 끄고 다시 눌러 보세요. 제출하기 전까지 만든 가락은 이 기기의 브라우저에만 저장됩니다.</p>
+  <p class="foot">소리는 단소 음색을 흉내 낸 합성음입니다. 소리가 나지 않으면 기기의 무음 모드를 끄고 다시 눌러 보세요. 제출하기 전까지 만든 가락은 이 기기의 브라우저에만 저장됩니다. <a href="teacher.html">선생님 페이지</a></p>
 </div>
 
 <script>
@@ -426,15 +408,19 @@ let picks = Array(N).fill(null);
 let sel = 0;
 let who = '';
 let stuNo = '';
+let grade = '', cls = '', perform = '';
 try{
   const s = JSON.parse(localStorage.getItem(STORE)||'null');
   if(s && Array.isArray(s.picks) && s.picks.length===N){
     picks = s.picks.map(x=>BY[x]?x:null);
     who = typeof s.who==='string'?s.who:'';
     stuNo = typeof s.no==='string'?s.no:'';
+    grade = typeof s.grade==='string'?s.grade:'';
+    cls = typeof s.cls==='string'?s.cls:'';
+    perform = typeof s.perform==='string'?s.perform:'';
   }
 }catch(e){}
-function save(){ try{ localStorage.setItem(STORE, JSON.stringify({picks,who,no:stuNo})); }catch(e){} }
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify({picks,who,no:stuNo,grade,cls,perform})); }catch(e){} }
 const firstEmpty = ()=>{ const i=picks.indexOf(null); return i<0?0:i; };
 sel = firstEmpty();
 
@@ -725,7 +711,21 @@ whoEl.value=who;
 whoEl.addEventListener('input',()=>{ who=whoEl.value.trim(); save(); renderResult(); });
 const noEl=document.getElementById('no');
 noEl.value=stuNo;
-noEl.addEventListener('input',()=>{ stuNo=noEl.value.trim(); save(); });
+noEl.addEventListener('input',()=>{ stuNo=noEl.value.trim(); save(); renderMe(); });
+const gradeEl=document.getElementById('grade'), clsEl=document.getElementById('cls');
+for(let i=1;i<=15;i++){ const o=document.createElement('option'); o.textContent=i; clsEl.appendChild(o); }
+gradeEl.value=grade; clsEl.value=cls;
+gradeEl.addEventListener('change',()=>{ grade=gradeEl.value; save(); renderMe(); });
+clsEl.addEventListener('change',()=>{ cls=clsEl.value; save(); renderMe(); });
+document.querySelectorAll('input[name="perform"]').forEach(r=>{
+  r.checked = r.value===perform;
+  r.addEventListener('change',()=>{ perform=r.value; save(); });
+});
+function renderMe(){
+  document.getElementById('meTag').textContent = (grade&&cls&&stuNo) ? grade+'학년 '+cls+'반 '+stuNo+'번 '+(who||'') : '맨 위 ‘내 정보’를 먼저 적어 주세요';
+}
+whoEl.addEventListener('input',renderMe);
+renderMe();
 
 document.getElementById('copyBtn').addEventListener('click',()=>{
   const syl=['저','기'].concat(SYL), ns=['潢','汰'].concat(picks);
@@ -736,17 +736,6 @@ document.getElementById('copyBtn').addEventListener('click',()=>{
   const fallback=()=>{ fb.hidden=false; fb.value=txt; fb.focus(); fb.select(); note.textContent='아래 글을 길게 눌러 복사하세요.'; };
   try{
     navigator.clipboard.writeText(txt).then(()=>{ note.textContent='복사했어요. 학급 게시판이나 활동지에 붙여 넣으세요.'; fb.hidden=true; }, fallback);
-  }catch(e){ fallback(); }
-});
-
-document.getElementById('copySheet').addEventListener('click',()=>{
-  const bads = picks.some((_,b)=>badAt(b));
-  const full = picks.every(Boolean);
-  const txt = [who||'(이름)', picks.map(k=>k?BY[k].hg:'?').join(' '), full?'O':'X', (!bads && picks.some(Boolean))?'O':'X'].join('\t');
-  const note=document.getElementById('copyNote'), fb=document.getElementById('copyFallback');
-  const fallback=()=>{ fb.hidden=false; fb.value=txt; fb.focus(); fb.select(); note.textContent='아래 글을 길게 눌러 복사하세요.'; };
-  try{
-    navigator.clipboard.writeText(txt).then(()=>{ note.textContent='복사했어요. 기록표에서 이 학생 행의 ‘이름’ 칸을 누르고 붙여 넣으세요.'; fb.hidden=true; }, fallback);
   }catch(e){ fallback(); }
 });
 
@@ -764,85 +753,35 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-/* ---------- 제출 (구글 시트 기록표) ---------- */
-const GS_CODE = "// 나만의 도라지타령 — 학생이 제출한 가락을 이 시트의 '기록표' 탭에 적습니다.\n// 시트 메뉴 [확장 프로그램 → Apps Script]에 붙여 넣고, [배포 → 새 배포 → 웹 앱]으로 배포하세요.\nconst SHEET_NAME = '기록표';\nconst FIRST_ROW = 5; // 1번 학생이 있는 줄\nconst TIME_COL = 9;  // I열: 제출 시각\n\nfunction doGet(e) {\n  const p = (e && e.parameter) || {};\n  let out;\n  try {\n    out = p.action === 'ping' ? ping_() : save_(JSON.parse(p.data || '{}'));\n  } catch (err) {\n    out = { ok: false, error: String((err && err.message) || err) };\n  }\n  const json = JSON.stringify(out);\n  const cb = /^[A-Za-z_$][\\w$]*$/.test(p.callback || '') ? p.callback : '';\n  return cb\n    ? ContentService.createTextOutput(cb + '(' + json + ');').setMimeType(ContentService.MimeType.JAVASCRIPT)\n    : ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);\n}\n\nfunction ping_() {\n  sheet_();\n  return { ok: true, sheet: SpreadsheetApp.getActiveSpreadsheet().getName() };\n}\n\nfunction save_(d) {\n  const no = Math.floor(Number(d.no));\n  if (!(no >= 1 && no <= 99)) throw new Error('번호를 1~99 사이로 적어 주세요.');\n  const row = FIRST_ROW + no - 1;\n  const values = [[\n    text_(d.name, 30),\n    text_(d.melody, 120),\n    d.full ? 'O' : 'X',\n    d.rule ? 'O' : 'X',\n  ]];\n  const lock = LockService.getScriptLock();\n  lock.waitLock(10000);\n  try {\n    const sheet = sheet_();\n    if (!sheet.getRange(FIRST_ROW - 2, TIME_COL).getValue()) {\n      sheet.getRange(FIRST_ROW - 2, TIME_COL).setValue('제출 시각');\n    }\n    sheet.getRange(row, 1).setValue(no);\n    sheet.getRange(row, 2, 1, 4).setValues(values);\n    sheet.getRange(row, TIME_COL).setValue(new Date());\n  } finally {\n    lock.releaseLock();\n  }\n  return { ok: true, no: no };\n}\n\nfunction sheet_() {\n  const s = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);\n  if (!s) throw new Error(\"'\" + SHEET_NAME + \"' 탭을 찾을 수 없어요. 탭 이름을 확인해 주세요.\");\n  return s;\n}\n\n// 학생이 쓴 글이 수식으로 바뀌지 않게 막습니다.\nfunction text_(v, max) {\n  const s = String(v == null ? '' : v).slice(0, max);\n  return /^[=+\\-@]/.test(s) ? \"'\" + s : s;\n}\n";
-const params = new URLSearchParams(location.search);
-const classId = (params.get('c')||'').replace(/[^A-Za-z0-9_-]/g,'');
-const execUrl = id => 'https://script.google.com/macros/s/'+id+'/exec';
-function jsonp(url, data, timeout){
-  return new Promise((resolve,reject)=>{
-    const cb = 'dj'+Date.now()+Math.floor(Math.random()*1e6);
-    const el = document.createElement('script');
-    const done = ()=>{ clearTimeout(t); delete window[cb]; el.remove(); };
-    const t = setTimeout(()=>{ done(); reject(new Error('timeout')); }, timeout||20000);
-    window[cb] = d=>{ done(); resolve(d); };
-    el.onerror = ()=>{ done(); reject(new Error('load')); };
-    el.src = url+'?'+new URLSearchParams(Object.assign({}, data, {callback:cb}));
-    document.head.appendChild(el);
-  });
-}
+/* ---------- 제출 (Supabase) ---------- */
+const CFG = window.DORAJI_CONFIG || {};
 function setMsg(el, text, kind){ el.textContent=text; el.className='submit-msg'+(kind?' '+kind:''); }
-
-const submitBtn=document.getElementById('submitBtn'), submitMsg=document.getElementById('submitMsg'), submitHelp=document.getElementById('submitHelp');
-if(!classId){
-  submitBtn.disabled=true;
-  submitHelp.textContent='선생님께 받은 우리 반 링크로 들어오면 제출할 수 있어요.';
-}else{
-  submitHelp.textContent='번호와 이름을 적고 빈칸 12개를 모두 채운 뒤 제출해요. 다시 제출하면 새 가락으로 바뀌어요.';
-  document.getElementById('teacher').hidden=true;
-}
+const submitBtn=document.getElementById('submitBtn'), submitMsg=document.getElementById('submitMsg');
+document.getElementById('submitHelp').textContent='다시 제출하면 새 가락으로 바뀌어요.';
+function needMe(el,text){ setMsg(submitMsg,text,'no'); el.focus(); el.scrollIntoView({block:'center',behavior:'smooth'}); }
 submitBtn.addEventListener('click',async()=>{
   const n=parseInt(stuNo,10);
-  if(!(n>=1 && n<=99)){ setMsg(submitMsg,'번호를 적어 주세요.','no'); noEl.focus(); return; }
-  if(!who){ setMsg(submitMsg,'이름을 적어 주세요.','no'); whoEl.focus(); return; }
+  if(!grade) return needMe(gradeEl,'맨 위에서 학년을 골라 주세요.');
+  if(!cls) return needMe(clsEl,'맨 위에서 반을 골라 주세요.');
+  if(!(n>=1 && n<=40)) return needMe(noEl,'맨 위에 번호를 적어 주세요.');
+  if(!who) return needMe(whoEl,'맨 위에 이름을 적어 주세요.');
   const left=picks.filter(x=>!x).length;
   if(left){ setMsg(submitMsg,'빈칸이 '+left+'개 남았어요. 모두 채운 뒤 제출해요.','no'); return; }
+  if(!perform){ setMsg(submitMsg,'발표 방법을 골라 주세요.','no'); return; }
   const rule = !picks.some((_,b)=>badAt(b));
   submitBtn.disabled=true; setMsg(submitMsg,'보내는 중…');
   try{
-    const r = await jsonp(execUrl(classId), {data: JSON.stringify({no:n, name:who, melody:picks.map(k=>BY[k].hg).join(' '), full:true, rule})});
-    if(r && r.ok) setMsg(submitMsg, n+'번 '+who+' 제출 완료! '+(rule?'':'(음 이동 조건을 다시 확인해 보세요)'),'ok');
-    else setMsg(submitMsg,'제출하지 못했어요: '+((r&&r.error)||'알 수 없는 오류'),'no');
+    const res = await fetch(CFG.url+'/rest/v1/rpc/doraji_submit',{
+      method:'POST',
+      headers:{'apikey':CFG.key,'Content-Type':'application/json'},
+      body:JSON.stringify({p_grade:+grade,p_class:+cls,p_no:n,p_name:who.slice(0,20),
+        p_melody:picks.map(k=>BY[k].hg).join(' '),p_all_filled:true,p_step_rule:rule,p_perform:perform})
+    });
+    if(res.ok) setMsg(submitMsg, grade+'학년 '+cls+'반 '+n+'번 '+who+' 제출 완료!'+(rule?'':' (음 이동 조건을 다시 확인해 보세요)'),'ok');
+    else setMsg(submitMsg,'제출하지 못했어요. 선생님께 알려 주세요. (오류 '+res.status+')','no');
   }catch(e){
     setMsg(submitMsg,'제출하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 보세요.','no');
   }finally{ submitBtn.disabled=false; }
-});
-
-/* 선생님 설정 */
-document.getElementById('gsCode').textContent = GS_CODE;
-const gsUrl=document.getElementById('gsUrl'), setupMsg=document.getElementById('setupMsg');
-function idFromUrl(){
-  const v=gsUrl.value.trim();
-  const m=v.match(/\/macros\/s\/([A-Za-z0-9_-]+)\//);
-  return m?m[1]:(/^[A-Za-z0-9_-]{20,}$/.test(v)?v:'');
-}
-function copyText(txt, input, note){
-  const fallback=()=>{ if(input){ input.focus(); input.select(); } setMsg(note,'자동 복사가 안 돼요. 선택된 글을 직접 복사해 주세요.','no'); };
-  try{ navigator.clipboard.writeText(txt).then(()=>setMsg(note,'복사했어요.','ok'),fallback); }catch(e){ fallback(); }
-}
-document.getElementById('copyCode').addEventListener('click',()=>{
-  try{ navigator.clipboard.writeText(GS_CODE).then(()=>setMsg(setupMsg,'코드를 복사했어요. Apps Script에 붙여 넣으세요.','ok'),()=>{}); }catch(e){}
-});
-document.getElementById('testUrl').addEventListener('click',async()=>{
-  const id=idFromUrl();
-  if(!id){ setMsg(setupMsg,'웹 앱 URL을 확인해 주세요. https://script.google.com/macros/s/…/exec 모양이어야 해요.','no'); return; }
-  setMsg(setupMsg,'확인하는 중…');
-  try{
-    const r=await jsonp(execUrl(id),{action:'ping'});
-    if(r&&r.ok) setMsg(setupMsg,'연결됐어요: “'+r.sheet+'” 시트에 기록됩니다.','ok');
-    else setMsg(setupMsg,'시트에 연결했지만 문제가 있어요: '+((r&&r.error)||''),'no');
-  }catch(e){ setMsg(setupMsg,'연결되지 않았어요. 배포할 때 액세스 권한을 ‘모든 사용자’로 했는지 확인해 주세요.','no'); }
-});
-document.getElementById('makeLink').addEventListener('click',()=>{
-  const id=idFromUrl();
-  if(!id){ setMsg(setupMsg,'웹 앱 URL을 먼저 붙여 넣어 주세요.','no'); return; }
-  const link=location.origin+location.pathname+'?c='+id;
-  document.getElementById('classLink').value=link;
-  document.getElementById('classLinkBox').hidden=false;
-  setMsg(setupMsg,'우리 반 링크가 만들어졌어요. 이 링크를 학생들에게 나눠 주세요.','ok');
-});
-document.getElementById('copyLink').addEventListener('click',()=>{
-  const el=document.getElementById('classLink'); copyText(el.value, el, setupMsg);
 });
 
 renderLyrics();

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>도라지타령 제출 기록</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Gowun+Dodum&display=swap">
+<style>
+:root{
+  --bg:#E9ECE5;--sheet:#F7F7F2;--ink:#1E2326;--muted:#5B645F;--line:#8E978F;--line-soft:#C9CEC6;
+  --accent:#2C4A7A;--accent-ink:#FFFFFF;--warn:#A8402C;--ok:#2C7552;--miss:#F3E3AE;
+  --f-display:"Gowun Batang",serif;--f-body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#141719;--sheet:#1D2124;--ink:#E7E9E3;--muted:#A2AAA4;--line:#59615C;--line-soft:#353B3E;
+    --accent:#93AEE0;--accent-ink:#10151C;--warn:#EE8F7B;--ok:#7CCBA2;--miss:#4A3F1E;color-scheme:dark}
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px));display:grid;gap:20px}
+h1,h2{font-family:var(--f-display);margin:0;line-height:1.25;text-wrap:balance}
+h1{font-size:clamp(26px,4vw,34px)}
+.eyebrow{font-size:13px;letter-spacing:.08em;color:var(--muted)}
+.lede{color:var(--muted);margin:6px 0 0}
+.lede a{color:var(--accent)}
+.card{background:var(--sheet);border:1px solid var(--line-soft);border-radius:6px;padding:20px clamp(16px,3vw,26px);display:grid;gap:14px;min-width:0}
+.form{display:grid;grid-template-columns:minmax(0,12em) repeat(3,minmax(0,7em)) auto;gap:10px 14px;align-items:end}
+.form label{display:grid;gap:4px;font-size:14px;font-weight:700;color:var(--muted)}
+.form input,.form select{font:inherit;font-size:16px;padding:8px 10px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%;min-width:0}
+.btn{font:inherit;border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:700}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.msg{font-size:14px;font-weight:700;margin:0;min-height:1.4em}
+.msg.no{color:var(--warn)}.msg.ok{color:var(--ok)}
+.help{font-size:13px;color:var(--muted);margin:0}
+.bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.bar .btns{display:flex;flex-wrap:wrap;gap:8px}
+.summary{font-size:14px;color:var(--muted)}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;vertical-align:middle}
+th{background:var(--accent);color:var(--accent-ink);font-weight:700;white-space:nowrap}
+td.melody{text-align:left;white-space:nowrap}
+tr.miss td{background:var(--miss);color:var(--muted)}
+.report-head{display:none}
+@media (max-width:640px){.form{grid-template-columns:repeat(3,minmax(0,1fr))}.form .pw{grid-column:1/-1}.form .go{grid-column:1/-1}}
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  body{background:#fff;color:#000;font-size:11pt}
+  .no-print{display:none!important}
+  .wrap{padding:0;max-width:none}
+  .card{border:0;padding:0;background:#fff}
+  .report-head{display:block;margin-bottom:8px}
+  .report-head h2{font-size:16pt}
+  .report-head p{margin:2px 0;font-size:10pt}
+  th{background:#e8ecf3!important;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  th,td{border:1px solid #000}
+  tr.miss td{background:#fff;color:#000}
+}
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="no-print">
+    <div class="eyebrow">선생님 페이지 · 음악 창작 실기평가</div>
+    <h1>도라지타령 제출 기록</h1>
+    <p class="lede">학년과 반을 고르면 그 반 학생들이 제출한 가락을 볼 수 있어요. Word 파일로 내려받거나 PDF로 저장할 수 있어요. <a href="./">학생 화면으로 가기</a></p>
+  </header>
+
+  <section class="card no-print">
+    <form class="form" id="form">
+      <label class="pw" for="pw">교사 비밀번호<input id="pw" type="password" autocomplete="current-password" required></label>
+      <label for="grade">학년<select id="grade" required><option value="">선택</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+      <label for="cls">반<select id="cls" required><option value="">선택</option></select></label>
+      <label for="total">학생 수<input id="total" type="number" min="1" max="40" inputmode="numeric" placeholder="예: 26"></label>
+      <button class="btn primary go" type="submit" id="load">불러오기</button>
+    </form>
+    <p class="msg" id="msg" role="status"></p>
+    <p class="help">학생 수를 적으면 아직 제출하지 않은 번호도 ‘미제출’로 함께 나와요.</p>
+  </section>
+
+  <section class="card" id="result" hidden>
+    <div class="report-head">
+      <h2 id="reportTitle"></h2>
+      <p>성취기준 [6음03-02] 기초적인 기보를 활용하여 간단한 조건에 따라 악곡의 일부를 바꾼다.</p>
+      <p>평가 내용: 도라지타령 마지막 줄 가락 바꾸기 (빈칸 12칸, 같은 음이나 바로 위·아래 음으로만 이동)</p>
+    </div>
+    <div class="bar no-print">
+      <span class="summary" id="summary"></span>
+      <div class="btns">
+        <button class="btn" type="button" id="wordBtn">Word로 내려받기</button>
+        <button class="btn" type="button" id="pdfBtn">PDF로 저장</button>
+      </div>
+    </div>
+    <div class="table-wrap"><table id="table"></table></div>
+    <p class="help no-print">PDF로 저장: 인쇄 창이 열리면 ‘대상’ 또는 ‘프린터’를 <b>PDF로 저장</b>으로 바꾸고 저장하세요.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+'use strict';
+const CFG = window.DORAJI_CONFIG || {};
+const $ = id => document.getElementById(id);
+const clsEl=$('cls');
+for(let i=1;i<=15;i++){ const o=document.createElement('option'); o.textContent=i; clsEl.appendChild(o); }
+try{ $('pw').value = sessionStorage.getItem('doraji-pw')||''; }catch(e){}
+try{ const last=JSON.parse(localStorage.getItem('doraji-teacher')||'{}'); if(last.grade) $('grade').value=last.grade; if(last.cls) clsEl.value=last.cls; if(last.total) $('total').value=last.total; }catch(e){}
+
+const COLS=['번호','이름','만든 가락 (12칸)','빈칸 모두 채움','음 이동 규칙','발표 방법','제출 시각'];
+let rows=[], meta={};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ox=b=>b?'O':'X';
+function when(t){
+  if(!t) return '';
+  const d=new Date(t);
+  return (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function setMsg(t,k){ const m=$('msg'); m.textContent=t; m.className='msg'+(k?' '+k:''); }
+
+function tableRows(){
+  const byNo=new Map(rows.map(r=>[r.student_no,r]));
+  const total=meta.total||0;
+  const nos=[...new Set([...Array.from({length:total},(_,i)=>i+1), ...byNo.keys()])].sort((a,b)=>a-b);
+  return nos.map(n=>{
+    const r=byNo.get(n);
+    return r ? {miss:false, cells:[n,r.name,r.melody,ox(r.all_filled),ox(r.step_rule),r.perform,when(r.submitted_at)]}
+             : {miss:true, cells:[n,'','미제출','','','','']};
+  });
+}
+function tableHTML(){
+  return '<thead><tr>'+COLS.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead><tbody>'+
+    tableRows().map(r=>'<tr'+(r.miss?' class="miss"':'')+'>'+r.cells.map((c,i)=>'<td'+(i===2?' class="melody"':'')+'>'+esc(c)+'</td>').join('')+'</tr>').join('')+'</tbody>';
+}
+function render(){
+  const title=meta.grade+'학년 '+meta.cls+'반 도라지타령 창작 실기평가 기록';
+  $('reportTitle').textContent=title;
+  $('table').innerHTML=tableHTML();
+  const done=rows.length;
+  $('summary').textContent=meta.grade+'학년 '+meta.cls+'반 · 제출 '+done+'명'+(meta.total?' / '+meta.total+'명':'');
+  $('result').hidden=false;
+  document.title=title;
+}
+
+$('form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const pw=$('pw').value, grade=$('grade').value, cls=clsEl.value, total=parseInt($('total').value,10)||0;
+  if(!pw||!grade||!cls){ setMsg('비밀번호, 학년, 반을 모두 적어 주세요.','no'); return; }
+  try{ sessionStorage.setItem('doraji-pw',pw); localStorage.setItem('doraji-teacher',JSON.stringify({grade,cls,total})); }catch(e){}
+  $('load').disabled=true; setMsg('불러오는 중…');
+  try{
+    const res=await fetch(CFG.url+'/rest/v1/rpc/doraji_list',{
+      method:'POST', headers:{'apikey':CFG.key,'Content-Type':'application/json'},
+      body:JSON.stringify({p_password:pw,p_grade:+grade,p_class:+cls})
+    });
+    const body=await res.json().catch(()=>null);
+    if(!res.ok){
+      const wrong = body && /wrong password/.test(body.message||'');
+      setMsg(wrong?'비밀번호가 맞지 않아요.':'불러오지 못했어요. (오류 '+res.status+(body&&body.message?': '+body.message:'')+')','no');
+      return;
+    }
+    rows=Array.isArray(body)?body:[]; meta={grade,cls,total};
+    render();
+    setMsg(rows.length?rows.length+'명의 기록을 불러왔어요.':'아직 제출한 학생이 없어요.', rows.length?'ok':'');
+  }catch(err){
+    setMsg('연결하지 못했어요. 인터넷 연결을 확인해 주세요.','no');
+  }finally{ $('load').disabled=false; }
+});
+
+$('wordBtn').addEventListener('click',()=>{
+  const title=esc($('reportTitle').textContent);
+  const html='﻿<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>'+title+'</title>'+
+    '<style>@page Section1{size:841.9pt 595.3pt;mso-page-orientation:landscape;margin:36pt}div.Section1{page:Section1}'+
+    'body{font-family:"맑은 고딕",sans-serif;font-size:10.5pt}h1{font-size:15pt}p{margin:2pt 0;font-size:9.5pt}'+
+    'table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;padding:4pt 6pt;text-align:center;font-size:10pt}th{background:#E8ECF3}td.melody{text-align:left}</style></head>'+
+    '<body><div class="Section1"><h1>'+title+'</h1>'+
+    '<p>성취기준 [6음03-02] 기초적인 기보를 활용하여 간단한 조건에 따라 악곡의 일부를 바꾼다.</p>'+
+    '<p>평가 내용: 도라지타령 마지막 줄 가락 바꾸기 (빈칸 12칸, 같은 음이나 바로 위·아래 음으로만 이동)</p><br>'+
+    '<table>'+tableHTML()+'</table></div></body></html>';
+  const blob=new Blob([html],{type:'application/msword'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='도라지타령_'+meta.grade+'학년'+meta.cls+'반_창작평가.doc';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+});
+$('pdfBtn').addEventListener('click',()=>window.print());
+})();
+</script>
+</body>
+</html>
