@@ -18,6 +18,12 @@
   --line-soft:#C9CEC6;
   --accent:#2C4A7A;      /* 쪽빛 */
   --accent-ink:#FFFFFF;
+  --bamboo:#EBCB8B;
+  --bamboo-edge:#C9A65A;
+  --band:#B0646B;
+  --hole-open:#FFFFFF;    /* 운지 그림은 테마와 관계없이 교과서처럼 ○ 흰색, ● 검정 */
+  --hole-shut:#1E2326;
+  --finger-bg:#F1EFE6;
   --submit:#B4470F;      /* 진한 주황 */
   --submit-ink:#FFFFFF;
   --blank:#E7C766;       /* 교과서 빈칸 색(치자) */
@@ -88,6 +94,20 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
 .tone.high{border-style:dashed}
 .tone.far{opacity:.38}
 .tone.far::after{content:"멀어요";position:absolute;bottom:-18px;font-size:11px;color:var(--muted)}
+.fingers{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;padding:6px 0;border-radius:6px;background:var(--finger-bg)}
+.finger .cap{color:#5B645F}
+.finger.hit{background:#BFD3F2}
+.finger{display:grid;justify-items:center;gap:2px;padding:4px 0 2px;border-radius:6px;transition:background .15s}
+.finger svg{width:100%;max-width:62px;height:auto;display:block}
+.finger .cap{font-size:11px;color:var(--muted);min-height:1.3em}
+.tube{fill:var(--bamboo);stroke:var(--bamboo-edge);stroke-width:1}
+.band{fill:var(--band)}
+.h-open{fill:var(--hole-open);stroke:var(--hole-shut);stroke-width:1.4}
+.h-shut{fill:var(--hole-shut);stroke:var(--hole-shut);stroke-width:1.4}
+.finger-legend circle{stroke:var(--ink)}
+.finger-legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;color:var(--muted)}
+.finger-legend span{display:inline-flex;align-items:center;gap:5px}
+@media (max-width:520px){.fingers{gap:4px}}
 .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted)}
 
 /* 정간보 공통 */
@@ -257,6 +277,14 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
       <p>율명을 누르면 단소 소리가 납니다. 왼쪽이 낮은 음, 오른쪽으로 갈수록 높은 음이에요. 키보드 숫자 1~7로도 소리를 낼 수 있어요.</p>
     </div>
     <div class="stairs" id="stairs1"></div>
+    <div class="fingers" id="fingers" aria-label="단소 운지법"></div>
+    <div class="finger-legend">
+      <span><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" class="h-open"/></svg> 열기</span>
+      <span><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" class="h-shut"/></svg> 막기</span>
+      <span>대 옆의 점 = 뒷구멍(제1공, 왼손 엄지)</span>
+      <span>앞구멍은 아래부터 제2공(왼손 검지) · 제3공(왼손 중지) · 제4공(오른손 중지) · 제5공</span>
+      <span>청중 · 청임은 중 · 임과 같은 운지로 김을 세게 불어요</span>
+    </div>
     <div class="legend">
       <span>중 · 임 · 무 · 청황 · 청태 = 도라지타령의 기본 다섯 음</span>
       <span>점선 칸(청중 · 청임) = 더 높은 음</span>
@@ -486,6 +514,8 @@ function tap(k){
   audio();
   const m = ctx.createGain(); m.gain.value=0.9; m.connect(ctx.destination);
   danso(m, BY[k].f, ctx.currentTime+0.01, 0.75);
+  const fg=document.querySelector('.finger[data-k="'+k+'"]');
+  if(fg){ fg.classList.add('hit'); clearTimeout(fg._t); fg._t=setTimeout(()=>fg.classList.remove('hit'),700); }
 }
 
 /* ---------- 연주(순서대로) ---------- */
@@ -675,6 +705,20 @@ function focusSel(){
 }
 
 document.getElementById('stairs1').innerHTML = stairsHTML(true);
+/* 단소 운지 (교과서 운지표 기준) — [제1공(뒤), 제2공, 제3공, 제4공, 제5공], 1 = 막기 */
+const FINGER = {'仲':[1,1,1,1,0],'林':[1,1,1,0,0],'無':[1,1,0,0,0],'潢':[1,0,0,0,0],'汰':[0,0,0,0,0],'㳞':[1,1,1,1,0],'淋':[1,1,1,0,0]};
+function fingerSVG(f){
+  const hole=(x,y,shut)=>'<circle cx="'+x+'" cy="'+y+'" r="4.6" class="'+(shut?'h-shut':'h-open')+'"/>';
+  return '<svg viewBox="0 0 60 176" aria-hidden="true">'+
+    '<rect class="tube" x="25" y="4" width="16" height="168" rx="5"/>'+
+    '<rect class="band" x="25" y="16" width="16" height="7"/><rect class="band" x="25" y="122" width="16" height="7"/><rect class="band" x="25" y="152" width="16" height="7"/>'+
+    hole(33,36,f[4])+hole(33,58,f[3])+hole(33,90,f[2])+hole(33,112,f[1])+hole(10,136,f[0])+'</svg>';
+}
+document.getElementById('fingers').innerHTML = NOTES.map(n=>{
+  const f=FINGER[n.k];
+  const lab=n.hg+' 운지: 뒷구멍 '+(f[0]?'막기':'열기')+', 앞구멍 아래부터 '+f.slice(1).map(x=>x?'막기':'열기').join(' ');
+  return '<div class="finger" data-k="'+n.k+'" role="img" aria-label="'+lab+'">'+fingerSVG(f)+'<span class="cap">'+(n.high?'세게 불기':'&nbsp;')+'</span></div>';
+}).join('');
 document.getElementById('stairs2').innerHTML = stairsHTML(false);
 document.getElementById('stairs1').addEventListener('click',e=>{
   const b=e.target.closest('.tone'); if(b) tap(b.dataset.k);
