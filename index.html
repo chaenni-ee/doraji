@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>나만의 도라지타령</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Gowun+Dodum&family=Noto+Serif+KR:wght@600&family=Noto+Serif+TC:wght@600&display=swap">
+<style>
+/* Layout: 한지 위에 놓인 정간보. 위에서부터 ①율명 듣기 → ②마지막 줄 바꾸기 → ③전체 노래 → 가사 순서로 읽는 한 장짜리 활동지. */
+:root{
+  --bg:#E9ECE5;          /* 한지 */
+  --sheet:#F7F7F2;       /* 정간보 종이 */
+  --ink:#1E2326;         /* 먹 */
+  --muted:#5B645F;
+  --line:#8E978F;
+  --line-soft:#C9CEC6;
+  --accent:#2C4A7A;      /* 쪽빛 */
+  --accent-ink:#FFFFFF;
+  --blank:#E7C766;       /* 교과서 빈칸 색(치자) */
+  --blank-soft:#F3E3AE;
+  --now:#BFD3F2;
+  --warn:#A8402C;
+  --warn-bg:#F6DDD5;
+  --ok:#2C7552;
+  --ok-bg:#D7EDE0;
+  --chipL:88%;
+  --chipS:55%;
+  --barL:52%;
+  --shadow:0 1px 0 rgba(30,35,38,.08),0 6px 18px -10px rgba(30,35,38,.35);
+  --f-display:"Gowun Batang","Noto Serif KR",serif;
+  --f-body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-hanja:"Noto Serif KR","Noto Serif TC","Batang","AppleMyungjo",serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141719;--sheet:#1D2124;--ink:#E7E9E3;--muted:#A2AAA4;--line:#59615C;--line-soft:#353B3E;
+    --accent:#93AEE0;--accent-ink:#10151C;--blank:#B8973A;--blank-soft:#4A3F1E;--now:#2E4A75;
+    --warn:#EE8F7B;--warn-bg:#4A2620;--ok:#7CCBA2;--ok-bg:#1E3A2C;--chipL:26%;--chipS:38%;--barL:62%;
+    --shadow:0 1px 0 rgba(0,0,0,.4),0 6px 18px -10px rgba(0,0,0,.8);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141719;--sheet:#1D2124;--ink:#E7E9E3;--muted:#A2AAA4;--line:#59615C;--line-soft:#353B3E;
+  --accent:#93AEE0;--accent-ink:#10151C;--blank:#B8973A;--blank-soft:#4A3F1E;--now:#2E4A75;
+  --warn:#EE8F7B;--warn-bg:#4A2620;--ok:#7CCBA2;--ok-bg:#1E3A2C;--chipL:26%;--chipS:38%;--barL:62%;
+  --shadow:0 1px 0 rgba(0,0,0,.4),0 6px 18px -10px rgba(0,0,0,.8);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;-webkit-text-size-adjust:100%;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px;display:grid;gap:28px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.25}
+h1{font-size:clamp(28px,5vw,42px)}
+h2{font-size:clamp(21px,3vw,26px)}
+p{margin:0}
+button{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hj{font-family:var(--f-hanja);font-weight:600}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+.eyebrow{font-size:13px;letter-spacing:.08em;color:var(--muted)}
+.lede{color:var(--muted);max-width:60ch;margin-top:6px}
+.title-mark{display:flex;gap:4px}
+.title-mark span{writing-mode:vertical-rl;font-family:var(--f-display);font-size:15px;border:1.5px solid var(--ink);padding:6px 3px;background:var(--sheet)}
+
+/* section card */
+.step{background:var(--sheet);border:1px solid var(--line-soft);border-radius:6px;box-shadow:var(--shadow);padding:22px clamp(16px,3vw,28px);display:grid;gap:16px;min-width:0}
+.step-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.step-num{font-family:var(--f-display);color:var(--accent);font-size:15px;border:1.5px solid var(--accent);border-radius:50%;width:30px;height:30px;display:inline-grid;place-items:center;flex:none}
+.step-head p{color:var(--muted);flex-basis:100%}
+
+/* tone buttons (계단) */
+.stairs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end}
+.tone{--h:0;position:relative;display:grid;justify-items:center;gap:2px;padding:10px 4px 8px;border-radius:6px;border:1.5px solid hsl(var(--h) 35% 50% / .55);background:hsl(var(--h) var(--chipS) var(--chipL));cursor:pointer;transition:transform .08s ease;touch-action:manipulation}
+.tone:active,.tone.hit{transform:translateY(2px)}
+.tone .hj{font-size:clamp(24px,4vw,34px);line-height:1.1}
+.tone .hg{font-size:clamp(15px,2.2vw,19px);font-weight:700}
+.tone .sm{font-size:11px;color:var(--muted);min-height:1.3em}
+.tone .key{position:absolute;top:4px;left:6px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tone .bar{width:60%;border-radius:3px;background:hsl(var(--h) 60% var(--barL));margin-bottom:4px}
+.tone.high{border-style:dashed}
+.tone.far{opacity:.38}
+.tone.far::after{content:"멀어요";position:absolute;bottom:-18px;font-size:11px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted)}
+
+/* 정간보 공통 */
+.jgb{display:flex;flex-direction:row-reverse;gap:0;background:var(--sheet);border:2px solid var(--ink);width:max-content}
+.haeng{display:flex;flex-direction:column;border-left:1.5px solid var(--ink)}
+.haeng:last-child{border-left:0}
+.haeng-no{font-size:12px;text-align:center;color:var(--muted);border-bottom:1.5px solid var(--ink);padding:2px 0;font-variant-numeric:tabular-nums}
+.haeng.mine .haeng-no{background:var(--blank-soft);color:var(--ink)}
+.jg{display:flex;flex-direction:row-reverse;border-bottom:1px solid var(--line);height:var(--cellH,50px)}
+.jg.gak{border-bottom:2.5px solid var(--ink)}
+.jg:last-child{border-bottom:0}
+.jg.now{background:var(--now)}
+.jg .nt,.jg .ly{display:flex;flex-direction:column}
+.jg .nt{width:var(--ntW,54px)}
+.jg .ly{width:var(--lyW,24px);border-right:1px dotted var(--line);color:var(--accent);font-weight:700;font-size:var(--lyF,13px)}
+.sub{flex:1;display:flex;align-items:center;justify-content:center;gap:3px;min-height:0;line-height:1}
+.nt .sub .hj{font-size:var(--hjF,17px)}
+.nt .sub .hg{font-size:10px;color:var(--muted)}
+.nt.one .sub{flex-direction:column;gap:2px}
+.nt.one .sub .hj{font-size:var(--hjF1,21px)}
+.tie{color:var(--muted);font-size:14px}
+.rest{font-size:var(--hjF1,20px);color:var(--muted)}
+.qm{display:inline-grid;place-items:center;background:var(--blank);color:var(--ink);border-radius:4px;min-width:1.4em;height:1.3em;font-size:13px;font-weight:700}
+.sub.bl{background:var(--blank-soft)}
+
+.score-scroll{overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.score-scroll .jgb{margin-left:auto}
+
+/* ② 확대된 마지막 줄 */
+.compose{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:24px;align-items:start}
+.zoom-wrap{display:grid;gap:8px;justify-items:end}
+.zoom-legend{font-size:13px;color:var(--muted);display:flex;gap:14px;width:100%;justify-content:space-between}
+.zoom{--cellH:92px;--ntW:78px;--lyW:30px;--lyF:17px;--hjF:22px;--hjF1:30px}
+.zoom .haeng-no{font-size:13px}
+.zoom .nt .sub .hg{font-size:12px}
+.slot{all:unset;box-sizing:border-box;cursor:pointer;width:calc(100% - 8px);height:calc(100% - 6px);margin:3px 4px;border-radius:6px;background:var(--blank);display:flex;align-items:center;justify-content:center;gap:4px;line-height:1;border:2px solid transparent;transition:box-shadow .1s}
+.slot .hj{font-size:var(--hjF,22px)}
+.nt.one .slot{flex-direction:column}
+.nt.one .slot .hj{font-size:var(--hjF1,30px)}
+.slot .hg{font-size:12px}
+.slot.empty{background:var(--blank-soft);border:2px dashed var(--blank)}
+.slot.empty::before{content:"?";font-size:18px;color:var(--muted)}
+.slot.sel{border:2.5px solid var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
+.slot.bad{border-color:var(--warn);background:var(--warn-bg)}
+.slot:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.side{display:grid;gap:16px;min-width:0}
+.palette-wrap{display:grid;gap:8px}
+.palette-wrap .stairs{gap:6px}
+.palette-wrap .tone .hj{font-size:clamp(22px,3vw,28px)}
+.selinfo{font-size:15px}
+.selinfo b{color:var(--accent)}
+.rules{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:14px}
+.rules li{display:flex;gap:8px;align-items:flex-start}
+.pill{flex:none;font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;margin-top:2px;background:var(--line-soft);color:var(--muted)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.no{background:var(--warn-bg);color:var(--warn)}
+.warns{display:grid;gap:4px;font-size:14px;color:var(--warn)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1.5px solid var(--ink);background:transparent;border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px;touch-action:manipulation}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.quiet{border-color:var(--line);color:var(--muted);font-weight:400}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.btn .ic{width:0;height:0;border-left:10px solid currentColor;border-top:6px solid transparent;border-bottom:6px solid transparent}
+.btn.playing .ic{border:0;width:10px;height:10px;background:currentColor}
+
+/* 결과 카드 */
+.result{border-top:1px dashed var(--line);padding-top:16px;display:grid;gap:12px}
+.result-head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.name-field{display:flex;align-items:center;gap:8px;font-size:14px}
+.name-field input{font:inherit;padding:6px 10px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:10em}
+.line-out{display:flex;flex-wrap:wrap;gap:6px}
+.syl{display:grid;justify-items:center;gap:2px;min-width:44px;padding:6px 4px;border-radius:6px;background:var(--bg);border:1px solid var(--line-soft)}
+.syl .w{font-family:var(--f-display);font-size:22px}
+.syl .n{font-size:14px;font-weight:700;color:var(--accent)}
+.syl .n .hj{font-size:13px;color:var(--muted);margin-left:2px}
+.syl.given{opacity:.65}
+.syl.miss .n{color:var(--muted)}
+.copy-note{font-size:13px;color:var(--muted)}
+
+.id-fields{display:flex;flex-wrap:wrap;gap:8px 14px}
+.submit-box{display:grid;gap:6px;padding-top:4px}
+.submit-row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.submit-msg{font-size:14px;font-weight:700;margin:0}
+.submit-msg.ok{color:var(--ok)}
+.submit-msg.no{color:var(--warn)}
+.submit-help{font-size:13px;color:var(--muted)}
+.btn:disabled{opacity:.5;cursor:default}
+.teacher{display:block;contain:inline-size}
+.teacher[open] summary{margin-bottom:16px}
+.teacher summary{display:flex;gap:12px;align-items:center;cursor:pointer;list-style:none}
+.teacher summary::-webkit-details-marker{display:none}
+.teacher summary h2{font-size:clamp(18px,2.6vw,22px)}
+.teacher-body{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;font-size:15px;min-width:0}
+.setup{margin:0;padding-left:1.3em;display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.setup a{color:var(--accent)}
+.code-wrap{position:relative;margin-top:8px;min-width:0}
+.code-wrap .btn{position:absolute;top:6px;right:6px;padding:4px 12px;font-size:13px;background:var(--sheet)}
+.code-wrap pre{margin:0;max-height:220px;overflow:auto;background:var(--bg);border:1px solid var(--line-soft);border-radius:6px;padding:12px;font-size:12px;line-height:1.5}
+.setup-form{display:grid;gap:8px;min-width:0}
+.setup-form label{font-weight:700;font-size:14px}
+.setup-form input,.class-link input{font:inherit;font-size:14px;padding:8px 10px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%;min-width:0}
+.class-link{display:flex;gap:8px;align-items:center}
+.class-link input{flex:1}
+
+/* ③ 전체 */
+.player{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.tempo{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.tempo input{width:140px;accent-color:var(--accent)}
+.tempo output{font-variant-numeric:tabular-nums;color:var(--ink);min-width:2.5em}
+.full{--cellH:46px}
+.status-line{font-size:14px;color:var(--muted)}
+
+/* 가사 */
+.lyrics{display:grid;gap:4px;counter-reset:ln;margin:0;padding:0;list-style:none}
+.lyrics li{display:grid;grid-template-columns:2.2em 1fr;align-items:baseline;font-family:var(--f-display);font-size:clamp(18px,2.6vw,22px)}
+.lyrics li::before{counter-increment:ln;content:counter(ln);font-family:var(--f-body);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lyrics li.mine{background:var(--blank-soft);border-radius:4px}
+.lyrics li .tag{font-family:var(--f-body);font-size:12px;color:var(--muted);margin-left:8px}
+.lyr-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.note-box{font-size:14px;color:var(--muted);display:grid;gap:6px}
+.note-box b{color:var(--ink)}
+.foot{font-size:13px;color:var(--muted)}
+
+@media (max-width:820px){
+  .compose{grid-template-columns:minmax(0,1fr)}
+  .zoom-wrap{justify-items:center}
+  .palette-wrap{position:sticky;bottom:0;background:var(--sheet);padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line-soft);z-index:5}
+  .lyr-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:520px){
+  .stairs{gap:4px}
+  .tone{padding:8px 2px 6px}
+  .tone .sm{display:none}
+  .tone .key{display:none}
+  .zoom{--cellH:80px;--ntW:58px;--lyW:24px;--lyF:15px;--hjF:18px;--hjF1:26px}
+  .zoom .nt .sub .hg,.slot .hg{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">음악 창작 수행평가 · 경기민요 · 세마치장단</div>
+      <h1>나만의 도라지타령</h1>
+      <p class="lede">단소 소리로 율명을 익히고, 도라지타령의 마지막 줄 가락을 내 마음대로 바꿔 봅시다. 다 만들면 전체 노래를 들어 보고, 단소로 불거나 노래로 불러 봅니다.</p>
+    </div>
+    <div class="title-mark" aria-hidden="true"><span>도라지</span><span>타령</span></div>
+  </header>
+
+  <!-- ① 율명 듣기 -->
+  <section class="step" aria-labelledby="s1">
+    <div class="step-head">
+      <span class="step-num">1</span><h2 id="s1">율명 소리 듣기</h2>
+      <p>율명을 누르면 단소 소리가 납니다. 왼쪽이 낮은 음, 오른쪽으로 갈수록 높은 음이에요. 키보드 숫자 1~7로도 소리를 낼 수 있어요.</p>
+    </div>
+    <div class="stairs" id="stairs1"></div>
+    <div class="legend">
+      <span>중 · 임 · 무 · 청황 · 청태 = 도라지타령의 기본 다섯 음</span>
+      <span>점선 칸(청중 · 청임) = 더 높은 음</span>
+    </div>
+  </section>
+
+  <!-- ② 마지막 줄 바꾸기 -->
+  <section class="step" aria-labelledby="s2">
+    <div class="step-head">
+      <span class="step-num">2</span><h2 id="s2">마지막 줄 가락 바꾸기</h2>
+      <p>노란 빈칸을 누른 뒤 아래 율명을 고르세요. 율명을 고르면 소리가 나고 다음 빈칸으로 넘어갑니다. 가사 “저기 저 산 밑에 도라지가 한들한들”에 맞춰 12칸을 채워요.</p>
+    </div>
+    <div class="compose">
+      <div class="zoom-wrap">
+        <div class="zoom-legend"><span>← 오른쪽 줄부터 위에서 아래로 읽어요</span><span>파란 글자 = 가사</span></div>
+        <div class="score-scroll" style="max-width:100%"><div class="jgb zoom" id="zoom"></div></div>
+      </div>
+      <div class="side">
+        <div class="selinfo" id="selinfo"></div>
+        <div class="palette-wrap">
+          <div class="stairs" id="stairs2"></div>
+        </div>
+        <ul class="rules" id="rules"></ul>
+        <div class="warns" id="warns"></div>
+        <div class="btns">
+          <button class="btn primary" id="playLast" type="button"><span class="ic"></span>마지막 줄 듣기</button>
+          <button class="btn" id="clearOne" type="button">이 칸 지우기</button>
+          <button class="btn quiet" id="fillOrig" type="button">원래 가락 넣어 보기</button>
+          <button class="btn quiet" id="clearAll" type="button">모두 지우기</button>
+        </div>
+      </div>
+    </div>
+    <div class="result">
+      <div class="result-head">
+        <h3>내가 만든 마지막 줄</h3>
+        <div class="id-fields"><label class="name-field" for="no">번호 <input id="no" type="number" inputmode="numeric" min="1" max="40" placeholder="3" autocomplete="off" style="width:4.5em"></label><label class="name-field" for="who">이름 <input id="who" type="text" placeholder="김하늘" autocomplete="off"></label></div>
+      </div>
+      <div class="line-out" id="lineOut"></div>
+      <div class="btns">
+        <button class="btn" id="copyBtn" type="button">율명과 가사 복사하기</button>
+        <button class="btn quiet" id="copySheet" type="button">기록표용 복사</button>
+        <span class="copy-note" id="copyNote"></span>
+      </div>
+      <div class="submit-box" id="submitBox">
+        <div class="submit-row">
+          <button class="btn primary" id="submitBtn" type="button">선생님께 제출하기</button>
+          <span class="submit-msg" id="submitMsg" role="status"></span>
+        </div>
+        <p class="submit-help" id="submitHelp"></p>
+      </div>
+      <textarea id="copyFallback" hidden readonly rows="4" style="width:100%;font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px"></textarea>
+    </div>
+  </section>
+
+  <!-- ③ 전체 노래 -->
+  <section class="step" aria-labelledby="s3">
+    <div class="step-head">
+      <span class="step-num">3</span><h2 id="s3">전체 노래 들어 보기</h2>
+      <p>내가 바꾼 마지막 줄(노란 줄)이 들어간 도라지타령 전체를 들어 봅니다. 연주되는 칸이 파랗게 표시돼요.</p>
+    </div>
+    <div class="player">
+      <button class="btn primary" id="playMine" type="button"><span class="ic"></span>내 도라지타령 듣기</button>
+      <button class="btn" id="playOrig" type="button"><span class="ic"></span>원래 도라지타령 듣기</button>
+      <label class="tempo" for="tempo">빠르기 <input id="tempo" type="range" min="60" max="120" step="2" value="88"><output id="tempoOut">88</output></label>
+    </div>
+    <div class="status-line" id="fullStatus"></div>
+    <div class="score-scroll"><div class="jgb full" id="full"></div></div>
+  </section>
+
+  <!-- 가사 -->
+  <section class="step" aria-labelledby="s4">
+    <div class="step-head">
+      <span class="step-num">4</span><h2 id="s4">가사</h2>
+      <p>정간보 한 줄(행)이 가사 한 줄입니다. 노란 줄이 내가 가락을 바꾼 부분이에요.</p>
+    </div>
+    <div class="lyr-grid">
+      <ol class="lyrics" id="lyrics"></ol>
+      <div class="note-box">
+        <p><b>부르는 방법</b></p>
+        <p>1~4줄은 메기는 소리(앞소리), 5~7줄은 받는 소리(후렴)예요. 세마치장단에 맞춰 “덩 덩 덕 쿵 덕”을 무릎으로 치면서 불러 보세요.</p>
+        <p><b>가락을 바꿀 때 지킬 것</b></p>
+        <p>바로 위·아래 음이나 같은 음으로만 움직이면 노래하기도, 단소로 불기도 쉬워요. 마지막 칸을 <span class="hj">仲</span>(중)으로 끝내면 원래 노래처럼 마무리되는 느낌이 나요.</p>
+      </div>
+    </div>
+  </section>
+
+  <details class="step teacher" id="teacher">
+    <summary><span class="step-num">T</span><h2>선생님 설정 · 우리 반 제출 링크 만들기</h2></summary>
+    <div class="teacher-body">
+      <p>학생이 [제출하기]를 누르면 선생님의 구글 시트 기록표에 번호 줄마다 자동으로 기록됩니다. 반마다 링크가 달라서 다른 반 기록과 섞이지 않아요. 처음 한 번만 설정하면 됩니다.</p>
+      <ol class="setup">
+        <li>구글 드라이브에서 기록표 시트를 엽니다. 기록표가 없으면 <a href="https://github.com/chaenni-ee/doraji/raw/HEAD/%EA%B8%B0%EB%A1%9D%ED%91%9C_%EC%96%91%EC%8B%9D.xlsx" target="_blank" rel="noopener">기록표 양식</a>을 내려받아 드라이브에 올린 뒤 구글 시트로 엽니다.</li>
+        <li>시트 메뉴에서 <b>확장 프로그램 → Apps Script</b>를 누르고, 원래 있던 내용을 지운 뒤 아래 코드를 붙여 넣고 저장합니다.
+          <div class="code-wrap"><button class="btn quiet" id="copyCode" type="button">코드 복사</button><pre id="gsCode"></pre></div>
+        </li>
+        <li><b>배포 → 새 배포</b>를 누르고, 유형 선택(톱니바퀴)에서 <b>웹 앱</b>을 고릅니다. <b>다음 사용자 인증 정보로 실행: 나</b>, <b>액세스 권한: 모든 사용자</b>로 두고 [배포]를 누릅니다. 권한 확인 창이 나오면 내 계정을 고르고 허용합니다.</li>
+        <li>나온 <b>웹 앱 URL</b>(https://script.google.com/macros/s/…/exec)을 아래 칸에 붙여 넣습니다.</li>
+      </ol>
+      <div class="setup-form">
+        <label for="gsUrl">웹 앱 URL</label>
+        <input id="gsUrl" type="url" placeholder="https://script.google.com/macros/s/AKfy…/exec" autocomplete="off">
+        <div class="btns">
+          <button class="btn" id="testUrl" type="button">연결 확인</button>
+          <button class="btn primary" id="makeLink" type="button">우리 반 학생용 링크 만들기</button>
+        </div>
+        <p class="submit-msg" id="setupMsg" role="status"></p>
+        <div class="class-link" id="classLinkBox" hidden>
+          <input id="classLink" type="text" readonly>
+          <button class="btn" id="copyLink" type="button">링크 복사</button>
+        </div>
+      </div>
+      <p class="foot">기록표의 ‘기록표’ 탭에서 5번째 줄이 1번 학생입니다. 같은 번호로 다시 제출하면 그 줄이 새 가락으로 바뀌고, 제출 시각이 I열에 남습니다. 다른 반 선생님께는 이 페이지 주소만 알려 드리면 됩니다. 각자 자기 시트로 이 설정을 하면 됩니다.</p>
+    </div>
+  </details>
+
+  <p class="foot">소리는 단소 음색을 흉내 낸 합성음입니다. 소리가 나지 않으면 기기의 무음 모드를 끄고 다시 눌러 보세요. 제출하기 전까지 만든 가락은 이 기기의 브라우저에만 저장됩니다.</p>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- 율명 ---------- */
+const NOTES = [
+  {k:'仲', hg:'중',   sm:'',       f:415.30, h:4,   key:'1'},
+  {k:'林', hg:'임',   sm:'',       f:466.16, h:32,  key:'2'},
+  {k:'無', hg:'무',   sm:'',       f:554.37, h:140, key:'3'},
+  {k:'潢', hg:'청황', sm:'',       f:622.25, h:200, key:'4'},
+  {k:'汰', hg:'청태', sm:'',       f:698.46, h:265, key:'5'},
+  {k:'㳞', hg:'청중', sm:'높은 중', f:830.61, h:10,  key:'6', high:true},
+  {k:'淋', hg:'청임', sm:'높은 임', f:932.33, h:38,  key:'7', high:true},
+];
+const BY = Object.fromEntries(NOTES.map((n,i)=>[n.k,{...n,i}]));
+
+/* ---------- 도라지타령 정간보 (교과서 56쪽) ----------
+   한 칸 = 1정간, 3정간 = 1장단, 12정간 = 한 줄(행)
+   "潢-汰:심"  → 한 정간을 셋으로 나눔(潢 · 이음 · 汰), 가사는 음이 새로 시작될 때 차례로 붙음
+   "_" = 앞 음을 이어서 냄,  "△" = 쉼 */
+const SRC = [
+  '汰:도 汰:라 汰:지 汰:도 --潢:라 無:지 㳞:백 _ 淋-㳞:도 汰:라 --潢 無:지',
+  '潢-汰:심 汰:심 _ 潢-汰:산 潢-無:천 林仲-:에 林:백 無:도 --林:라 仲:지 _ △',
+  '汰:한 汰:두 _ 汰:뿌 --潢:리 無:만 㳞:캐 _ 淋-㳞:어 汰:도 --潢 無',
+  '潢-汰:대바 汰:구 汰:니 潢-汰:로 潢-無:반 林仲-:실 林:만 無:되 --林:누 仲:나 _ △',
+  '林:에 林-無:헤 仲:요 林:에 林-無:헤 仲:요 無:에 無:헤 --潢 無:야 _ 潢',
+  '汰:어 汰:여 汰:라 汰:난 --潢 無:다 㳞-㳞:지화 㳞:자 淋-㳞:자 汰:좋 --潢 無:다',
+];
+function parseRow(src){
+  return src.split(' ').map(tok=>{
+    const [n,l='']=tok.split(':');
+    return {s: n==='_'?[]:[...n], l:[...l]};
+  });
+}
+const ROW7 = [
+  {s:['潢','-','汰'], l:['저','기']},
+  {s:[{b:0}], l:['저']}, {s:[{b:1}], l:['산']},
+  {s:[{b:2},'-',{b:3}], l:['밑','에']},
+  {s:[{b:4},'-',{b:5}], l:['도','라']},
+  {s:[{b:6},{b:7},'-'], l:['지','가']},
+  {s:[{b:8}], l:['한']}, {s:[{b:9}], l:['들']}, {s:[{b:10}], l:['한']},
+  {s:[{b:11}], l:['들']}, {s:[], l:[]}, {s:['△'], l:[]},
+];
+const SONG = SRC.map(parseRow).concat([ROW7]);
+const ORIGINAL = ['汰','汰','潢','汰','潢','無','林','仲','林','無','林','仲'];
+const SYL = ['저','산','밑','에','도','라','지','가','한','들','한','들'];
+const LYRICS = [
+  '도라지 도라지 백도라지',
+  '심심산천에 백도라지',
+  '한두 뿌리만 캐어도',
+  '대바구니로 반실만 되누나',
+  '에헤요 에헤요 에헤야',
+  '어여라 난다 지화자자 좋다',
+  '저기 저 산 밑에 도라지가 한들한들',
+];
+const N = ORIGINAL.length;
+
+/* ---------- 상태 ---------- */
+const STORE='doraji-mine-v1';
+let picks = Array(N).fill(null);
+let sel = 0;
+let who = '';
+let stuNo = '';
+try{
+  const s = JSON.parse(localStorage.getItem(STORE)||'null');
+  if(s && Array.isArray(s.picks) && s.picks.length===N){
+    picks = s.picks.map(x=>BY[x]?x:null);
+    who = typeof s.who==='string'?s.who:'';
+    stuNo = typeof s.no==='string'?s.no:'';
+  }
+}catch(e){}
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify({picks,who,no:stuNo})); }catch(e){} }
+const firstEmpty = ()=>{ const i=picks.indexOf(null); return i<0?0:i; };
+sel = firstEmpty();
+
+/* ---------- 단소 소리 ---------- */
+let ctx=null, noiseBuf=null;
+function audio(){
+  if(!ctx){
+    const AC = window.AudioContext||window.webkitAudioContext;
+    ctx = new AC();
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  }
+  if(ctx.state==='suspended') ctx.resume();
+  return ctx;
+}
+function danso(out, f, t0, dur, vol=1){
+  const c = ctx;
+  const end = t0+dur;
+  const env = c.createGain();
+  const peak = 0.26*vol;
+  env.gain.setValueAtTime(0.0001, t0);
+  env.gain.setTargetAtTime(peak, t0, 0.018);
+  const relAt = t0+Math.max(0.05, dur-0.06);
+  if(t0+0.1<relAt) env.gain.setTargetAtTime(peak*0.78, t0+0.1, 0.12);
+  env.gain.setTargetAtTime(0.0001, relAt, 0.03);
+
+  const lp = c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=Math.min(5200, f*5); lp.Q.value=0.4;
+  lp.connect(env); env.connect(out);
+
+  // 비브라토(농음 느낌) — 길게 낼 때만 서서히
+  const lfo = c.createOscillator(); lfo.frequency.value=5.3;
+  const depth = c.createGain(); depth.gain.setValueAtTime(0, t0);
+  if(dur>0.4) depth.gain.linearRampToValueAtTime(f*0.008, t0+Math.min(0.9, dur*0.8));
+  lfo.connect(depth);
+
+  [[1,1],[2,0.2],[3,0.07],[4,0.025]].forEach(([m,a])=>{
+    const o = c.createOscillator(); o.type='sine';
+    o.frequency.setValueAtTime(f*m*0.982, t0);
+    o.frequency.exponentialRampToValueAtTime(f*m, t0+0.06);
+    const dg = c.createGain(); dg.gain.value=m; depth.connect(dg); dg.connect(o.frequency);
+    const g = c.createGain(); g.gain.value=a;
+    o.connect(g); g.connect(lp);
+    o.start(t0); o.stop(end+0.3);
+  });
+  lfo.start(t0); lfo.stop(end+0.3);
+
+  // 입김 소리
+  const ns = c.createBufferSource(); ns.buffer=noiseBuf; ns.loop=true;
+  const bp = c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=f*2.2; bp.Q.value=0.9;
+  const ng = c.createGain();
+  ng.gain.setValueAtTime(0.0001, t0);
+  ng.gain.linearRampToValueAtTime(0.11*vol, t0+0.02);
+  ng.gain.setTargetAtTime(0.022*vol, t0+0.03, 0.05);
+  ng.gain.setTargetAtTime(0.0001, relAt, 0.03);
+  ns.connect(bp); bp.connect(ng); ng.connect(out);
+  ns.start(t0, Math.random()*1.5); ns.stop(end+0.3);
+}
+function tap(k){
+  if(!BY[k]) return;
+  stopPlay();
+  audio();
+  const m = ctx.createGain(); m.gain.value=0.9; m.connect(ctx.destination);
+  danso(m, BY[k].f, ctx.currentTime+0.01, 0.75);
+}
+
+/* ---------- 연주(순서대로) ---------- */
+function bpm(){ return +document.getElementById('tempo').value; }
+function events(rowIdx, usePicks){
+  const D = 60/bpm();
+  const notes=[], cells=[]; let cur=null, t=0;
+  rowIdx.forEach(r=>SONG[r].forEach((cell,c)=>{
+    cells.push({key:r+'-'+c, t});
+    const toks = cell.s.length?cell.s:['-'];
+    const sd = D/toks.length;
+    toks.forEach(tok=>{
+      let n = tok;
+      if(typeof tok==='object') n = usePicks ? (picks[tok.b]||'△') : ORIGINAL[tok.b];
+      if(n==='-'){ if(cur) cur.end=t+sd; }
+      else if(n==='△'){ cur=null; }
+      else { cur={n,start:t,end:t+sd}; notes.push(cur); }
+      t+=sd;
+    });
+  }));
+  return {notes,cells,total:t};
+}
+let playing=null;
+function stopPlay(){
+  if(!playing) return;
+  try{ playing.master.gain.setTargetAtTime(0, ctx.currentTime, 0.02); }catch(e){}
+  const m = playing.master; setTimeout(()=>{ try{m.disconnect();}catch(e){} }, 200);
+  cancelAnimationFrame(playing.raf);
+  document.querySelectorAll('.jg.now').forEach(e=>e.classList.remove('now'));
+  playing.btn.classList.remove('playing');
+  playing.btn.querySelector('.lbl').textContent = playing.label;
+  playing=null;
+}
+function startPlay(btn, rowIdx, usePicks){
+  const was = playing && playing.btn===btn;
+  stopPlay();
+  if(was) return;
+  audio();
+  const master = ctx.createGain(); master.gain.value=0.9; master.connect(ctx.destination);
+  const ev = events(rowIdx, usePicks);
+  const t0 = ctx.currentTime+0.15;
+  ev.notes.forEach(n=>danso(master, BY[n.n].f, t0+n.start, n.end-n.start));
+  const lblEl = btn.querySelector('.lbl');
+  playing = {btn, master, raf:0, label:lblEl.textContent};
+  btn.classList.add('playing'); lblEl.textContent='멈추기';
+  let last=-1;
+  const tick=()=>{
+    if(!playing) return;
+    const now = ctx.currentTime - t0;
+    if(now > ev.total+0.2){ stopPlay(); return; }
+    let i=-1; for(let j=0;j<ev.cells.length;j++){ if(ev.cells[j].t<=now) i=j; else break; }
+    if(i!==last){
+      document.querySelectorAll('.jg.now').forEach(e=>e.classList.remove('now'));
+      if(i>=0) document.querySelectorAll('[data-cell="'+ev.cells[i].key+'"]').forEach(e=>e.classList.add('now'));
+      last=i;
+    }
+    playing.raf = requestAnimationFrame(tick);
+  };
+  playing.raf = requestAnimationFrame(tick);
+}
+
+/* ---------- 조건 검사 ---------- */
+function prevNote(b){ return b===0 ? '汰' : picks[b-1]; }
+function badAt(b){
+  const p=prevNote(b), n=picks[b];
+  return !!(p && n && Math.abs(BY[p].i-BY[n].i)>1);
+}
+
+/* ---------- 그리기 ---------- */
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function noteHTML(k){ return '<span class="hj">'+k+'</span><span class="hg">'+BY[k].hg+'</span>'; }
+
+function cellHTML(cell, r, c, mode){
+  const toks = cell.s;
+  const lyr = cell.l.slice();
+  const one = toks.length===1;
+  let nt='', ly='';
+  toks.forEach(tok=>{
+    let inner='', cls='sub', syl='';
+    if(typeof tok==='object'){
+      syl = lyr.shift()||'';
+      const k = picks[tok.b];
+      if(mode==='zoom'){
+        const c2 = 'slot'+(k?'':' empty')+(sel===tok.b?' sel':'')+(badAt(tok.b)?' bad':'');
+        const lab = '빈칸 '+(tok.b+1)+', 가사 '+SYL[tok.b]+', '+(k?BY[k].hg:'비어 있음');
+        inner = '<button type="button" class="'+c2+'" data-b="'+tok.b+'" aria-label="'+esc(lab)+'">'+(k?noteHTML(k):'')+'</button>';
+      }else{
+        cls+=' bl';
+        inner = k?noteHTML(k):'<span class="qm">?</span>';
+      }
+    }else if(tok==='-'){ inner='<span class="tie">–</span>'; }
+    else if(tok==='△'){ inner='<span class="rest">△</span>'; }
+    else { inner=noteHTML(tok); syl = lyr.shift()||''; }
+    nt += '<div class="'+cls+'">'+inner+'</div>';
+    ly += '<div class="sub">'+esc(syl)+'</div>';
+  });
+  const gak = (c%3===2 && c!==11)?' gak':'';
+  return '<div class="jg'+gak+'" data-cell="'+r+'-'+c+'"><div class="nt'+(one?' one':'')+'">'+nt+'</div><div class="ly">'+ly+'</div></div>';
+}
+
+function renderFull(){
+  let h='';
+  SONG.forEach((row,r)=>{
+    h+='<div class="haeng'+(r===6?' mine':'')+'"><div class="haeng-no">'+(r+1)+'줄</div>';
+    row.forEach((cell,c)=>{ h+=cellHTML(cell,r,c,'full'); });
+    h+='</div>';
+  });
+  document.getElementById('full').innerHTML=h;
+}
+function renderZoom(){
+  let h='';
+  for(let g=0; g<4; g++){
+    h+='<div class="haeng mine"><div class="haeng-no">'+(g+1)+'장단</div>';
+    for(let c=g*3;c<g*3+3;c++){
+      let x = cellHTML(ROW7[c],6,c,'zoom');
+      if(c%3===2) x=x.replace('jg gak','jg');
+      h+=x;
+    }
+    h+='</div>';
+  }
+  document.getElementById('zoom').innerHTML=h;
+}
+function stairsHTML(withKeys){
+  return NOTES.map(n=>{
+    const bar = 8+n.i_lvl*7;
+    return '<button type="button" class="tone'+(n.high?' high':'')+'" data-k="'+n.k+'" style="--h:'+n.h+'" aria-label="'+n.hg+' 소리">'+
+      (withKeys?'<span class="key">'+n.key+'</span>':'')+
+      '<span class="bar" style="height:'+bar+'px"></span>'+
+      '<span class="hj">'+n.k+'</span><span class="hg">'+n.hg+'</span><span class="sm">'+(n.sm||'&nbsp;')+'</span></button>';
+  }).join('');
+}
+NOTES.forEach((n,i)=>n.i_lvl=i);
+
+function renderSide(){
+  const filled = picks.filter(Boolean).length;
+  const bads = picks.map((_,b)=>badAt(b)?b:-1).filter(b=>b>=0);
+  const p = prevNote(sel);
+  document.getElementById('selinfo').innerHTML =
+    '<b>'+(sel+1)+'번 빈칸</b> · 가사 “<b>'+SYL[sel]+'</b>” 자리'+
+    (p?' — 바로 앞 음은 <span class="hj">'+p+'</span>('+BY[p].hg+')예요.':' — 앞 칸을 먼저 채우면 고르기 쉬워요.');
+  document.querySelectorAll('#stairs2 .tone').forEach(el=>{
+    const k=el.dataset.k;
+    el.classList.toggle('far', !!(p && Math.abs(BY[p].i-BY[k].i)>1));
+  });
+  const allOk = filled===N && bads.length===0;
+  document.getElementById('rules').innerHTML =
+    '<li><span class="pill '+(filled===N?'ok':'')+'">'+filled+' / '+N+'</span>빈칸 하나에 율명 하나씩, 12칸을 모두 채워요.</li>'+
+    '<li><span class="pill '+(bads.length?'no':(filled?'ok':''))+'">'+(bads.length?'고쳐요':(filled?'좋아요':'대기'))+'</span>같은 음이나 바로 위·아래 음으로만 움직여요.</li>'+
+    '<li><span class="pill '+(allOk?'ok':'')+'">'+(allOk?'완성':'—')+'</span>다 채우면 ③에서 전체 노래를 들어 봐요.</li>';
+  document.getElementById('warns').innerHTML = bads.map(b=>{
+    const a=prevNote(b), n=picks[b];
+    return '<div>‘'+SYL[b]+'’ 칸('+(b+1)+'번): '+BY[a].hg+' → '+BY[n].hg+' 은(는) 음을 건너뛰었어요. '+BY[a].hg+'의 바로 위·아래 음으로 바꿔 보세요.</div>';
+  }).join('');
+}
+function renderResult(){
+  const seq = [['저','潢',true],['기','汰',true]].concat(SYL.map((s,b)=>[s,picks[b],false]));
+  document.getElementById('lineOut').innerHTML = seq.map(([s,k,g])=>
+    '<div class="syl'+(g?' given':'')+(k?'':' miss')+'"><span class="w">'+s+'</span><span class="n">'+(k?BY[k].hg+'<span class="hj">'+k+'</span>':'?')+'</span></div>'
+  ).join('');
+  const missing = picks.filter(x=>!x).length;
+  document.getElementById('fullStatus').textContent = missing
+    ? '마지막 줄에 아직 빈칸이 '+missing+'개 있어요. 빈칸은 쉬고 넘어갑니다.'
+    : (who?who+'의 ':'')+'도라지타령이 완성되었어요.';
+}
+function renderLyrics(){
+  document.getElementById('lyrics').innerHTML = LYRICS.map((l,i)=>
+    '<li'+(i===6?' class="mine"':'')+'><span>'+l+(i===6?'<span class="tag">내가 바꾼 가락</span>':'')+'</span></li>'
+  ).join('');
+}
+function renderAll(){ renderZoom(); renderFull(); renderSide(); renderResult(); }
+
+/* ---------- 조작 ---------- */
+function pick(k){
+  picks[sel]=k; save();
+  tap(k);
+  const next = picks.indexOf(null, sel+1);
+  if(next>=0) sel=next; else if(sel<N-1) sel=sel+1;
+  renderAll();
+  focusSel();
+}
+function focusSel(){
+  const el=document.querySelector('#zoom .slot[data-b="'+sel+'"]');
+  if(el && document.activeElement && document.activeElement.closest && document.activeElement.closest('#zoom')) el.focus();
+}
+
+document.getElementById('stairs1').innerHTML = stairsHTML(true);
+document.getElementById('stairs2').innerHTML = stairsHTML(false);
+document.getElementById('stairs1').addEventListener('click',e=>{
+  const b=e.target.closest('.tone'); if(b) tap(b.dataset.k);
+});
+document.getElementById('stairs2').addEventListener('click',e=>{
+  const b=e.target.closest('.tone'); if(b) pick(b.dataset.k);
+});
+document.getElementById('zoom').addEventListener('click',e=>{
+  const s=e.target.closest('.slot'); if(!s) return;
+  sel=+s.dataset.b;
+  if(picks[sel]) tap(picks[sel]);
+  renderAll();
+  const el=document.querySelector('#zoom .slot[data-b="'+sel+'"]'); if(el) el.focus();
+});
+document.getElementById('clearOne').addEventListener('click',()=>{ picks[sel]=null; save(); renderAll(); });
+document.getElementById('fillOrig').addEventListener('click',()=>{ picks=ORIGINAL.slice(); sel=0; save(); renderAll(); });
+const clearAll=document.getElementById('clearAll');
+let armed=0;
+clearAll.addEventListener('click',()=>{
+  if(!armed){ armed=setTimeout(()=>{armed=0;clearAll.textContent='모두 지우기';},3000); clearAll.textContent='한 번 더 누르면 지워져요'; return; }
+  clearTimeout(armed); armed=0; clearAll.textContent='모두 지우기';
+  picks=Array(N).fill(null); sel=0; save(); renderAll();
+});
+
+['playLast','playMine','playOrig'].forEach(id=>{
+  const b=document.getElementById(id);
+  const t=b.lastChild.textContent; b.lastChild.remove();
+  const s=document.createElement('span'); s.className='lbl'; s.textContent=t; b.appendChild(s);
+});
+document.getElementById('playLast').addEventListener('click',e=>startPlay(e.currentTarget,[6],true));
+document.getElementById('playMine').addEventListener('click',e=>startPlay(e.currentTarget,[0,1,2,3,4,5,6],true));
+document.getElementById('playOrig').addEventListener('click',e=>startPlay(e.currentTarget,[0,1,2,3,4,5,6],false));
+const tempo=document.getElementById('tempo');
+tempo.addEventListener('input',()=>{ document.getElementById('tempoOut').textContent=tempo.value; });
+
+const whoEl=document.getElementById('who');
+whoEl.value=who;
+whoEl.addEventListener('input',()=>{ who=whoEl.value.trim(); save(); renderResult(); });
+const noEl=document.getElementById('no');
+noEl.value=stuNo;
+noEl.addEventListener('input',()=>{ stuNo=noEl.value.trim(); save(); });
+
+document.getElementById('copyBtn').addEventListener('click',()=>{
+  const syl=['저','기'].concat(SYL), ns=['潢','汰'].concat(picks);
+  const txt = '나만의 도라지타령 마지막 줄'+(who?' — '+who:'')+'\n'+
+    syl.map((s,i)=>s+'('+(ns[i]?BY[ns[i]].hg:'?')+')').join(' ')+'\n'+
+    '율명: '+ns.map(k=>k?BY[k].hg:'?').join(' ');
+  const note=document.getElementById('copyNote'), fb=document.getElementById('copyFallback');
+  const fallback=()=>{ fb.hidden=false; fb.value=txt; fb.focus(); fb.select(); note.textContent='아래 글을 길게 눌러 복사하세요.'; };
+  try{
+    navigator.clipboard.writeText(txt).then(()=>{ note.textContent='복사했어요. 학급 게시판이나 활동지에 붙여 넣으세요.'; fb.hidden=true; }, fallback);
+  }catch(e){ fallback(); }
+});
+
+document.getElementById('copySheet').addEventListener('click',()=>{
+  const bads = picks.some((_,b)=>badAt(b));
+  const full = picks.every(Boolean);
+  const txt = [who||'(이름)', picks.map(k=>k?BY[k].hg:'?').join(' '), full?'O':'X', (!bads && picks.some(Boolean))?'O':'X'].join('\t');
+  const note=document.getElementById('copyNote'), fb=document.getElementById('copyFallback');
+  const fallback=()=>{ fb.hidden=false; fb.value=txt; fb.focus(); fb.select(); note.textContent='아래 글을 길게 눌러 복사하세요.'; };
+  try{
+    navigator.clipboard.writeText(txt).then(()=>{ note.textContent='복사했어요. 기록표에서 이 학생 행의 ‘이름’ 칸을 누르고 붙여 넣으세요.'; fb.hidden=true; }, fallback);
+  }catch(e){ fallback(); }
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea')||e.metaKey||e.ctrlKey||e.altKey) return;
+  const n = NOTES.find(x=>x.key===e.key);
+  const inCompose = document.activeElement && document.activeElement.closest && document.activeElement.closest('#zoom,#stairs2,.side');
+  if(n){ e.preventDefault(); inCompose ? pick(n.k) : tap(n.k); return; }
+  if(inCompose && (e.key==='Backspace'||e.key==='Delete')){ e.preventDefault(); picks[sel]=null; save(); renderAll(); focusSel(); }
+  if(inCompose && (e.key==='ArrowDown'||e.key==='ArrowRight'||e.key==='ArrowUp'||e.key==='ArrowLeft')){
+    e.preventDefault();
+    sel = Math.max(0, Math.min(N-1, sel + ((e.key==='ArrowDown'||e.key==='ArrowLeft')?1:-1)));
+    renderAll();
+    const el=document.querySelector('#zoom .slot[data-b="'+sel+'"]'); if(el) el.focus();
+  }
+});
+
+/* ---------- 제출 (구글 시트 기록표) ---------- */
+const GS_CODE = "// 나만의 도라지타령 — 학생이 제출한 가락을 이 시트의 '기록표' 탭에 적습니다.\n// 시트 메뉴 [확장 프로그램 → Apps Script]에 붙여 넣고, [배포 → 새 배포 → 웹 앱]으로 배포하세요.\nconst SHEET_NAME = '기록표';\nconst FIRST_ROW = 5; // 1번 학생이 있는 줄\nconst TIME_COL = 9;  // I열: 제출 시각\n\nfunction doGet(e) {\n  const p = (e && e.parameter) || {};\n  let out;\n  try {\n    out = p.action === 'ping' ? ping_() : save_(JSON.parse(p.data || '{}'));\n  } catch (err) {\n    out = { ok: false, error: String((err && err.message) || err) };\n  }\n  const json = JSON.stringify(out);\n  const cb = /^[A-Za-z_$][\\w$]*$/.test(p.callback || '') ? p.callback : '';\n  return cb\n    ? ContentService.createTextOutput(cb + '(' + json + ');').setMimeType(ContentService.MimeType.JAVASCRIPT)\n    : ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);\n}\n\nfunction ping_() {\n  sheet_();\n  return { ok: true, sheet: SpreadsheetApp.getActiveSpreadsheet().getName() };\n}\n\nfunction save_(d) {\n  const no = Math.floor(Number(d.no));\n  if (!(no >= 1 && no <= 99)) throw new Error('번호를 1~99 사이로 적어 주세요.');\n  const row = FIRST_ROW + no - 1;\n  const values = [[\n    text_(d.name, 30),\n    text_(d.melody, 120),\n    d.full ? 'O' : 'X',\n    d.rule ? 'O' : 'X',\n  ]];\n  const lock = LockService.getScriptLock();\n  lock.waitLock(10000);\n  try {\n    const sheet = sheet_();\n    if (!sheet.getRange(FIRST_ROW - 2, TIME_COL).getValue()) {\n      sheet.getRange(FIRST_ROW - 2, TIME_COL).setValue('제출 시각');\n    }\n    sheet.getRange(row, 1).setValue(no);\n    sheet.getRange(row, 2, 1, 4).setValues(values);\n    sheet.getRange(row, TIME_COL).setValue(new Date());\n  } finally {\n    lock.releaseLock();\n  }\n  return { ok: true, no: no };\n}\n\nfunction sheet_() {\n  const s = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);\n  if (!s) throw new Error(\"'\" + SHEET_NAME + \"' 탭을 찾을 수 없어요. 탭 이름을 확인해 주세요.\");\n  return s;\n}\n\n// 학생이 쓴 글이 수식으로 바뀌지 않게 막습니다.\nfunction text_(v, max) {\n  const s = String(v == null ? '' : v).slice(0, max);\n  return /^[=+\\-@]/.test(s) ? \"'\" + s : s;\n}\n";
+const params = new URLSearchParams(location.search);
+const classId = (params.get('c')||'').replace(/[^A-Za-z0-9_-]/g,'');
+const execUrl = id => 'https://script.google.com/macros/s/'+id+'/exec';
+function jsonp(url, data, timeout){
+  return new Promise((resolve,reject)=>{
+    const cb = 'dj'+Date.now()+Math.floor(Math.random()*1e6);
+    const el = document.createElement('script');
+    const done = ()=>{ clearTimeout(t); delete window[cb]; el.remove(); };
+    const t = setTimeout(()=>{ done(); reject(new Error('timeout')); }, timeout||20000);
+    window[cb] = d=>{ done(); resolve(d); };
+    el.onerror = ()=>{ done(); reject(new Error('load')); };
+    el.src = url+'?'+new URLSearchParams(Object.assign({}, data, {callback:cb}));
+    document.head.appendChild(el);
+  });
+}
+function setMsg(el, text, kind){ el.textContent=text; el.className='submit-msg'+(kind?' '+kind:''); }
+
+const submitBtn=document.getElementById('submitBtn'), submitMsg=document.getElementById('submitMsg'), submitHelp=document.getElementById('submitHelp');
+if(!classId){
+  submitBtn.disabled=true;
+  submitHelp.textContent='선생님께 받은 우리 반 링크로 들어오면 제출할 수 있어요.';
+}else{
+  submitHelp.textContent='번호와 이름을 적고 빈칸 12개를 모두 채운 뒤 제출해요. 다시 제출하면 새 가락으로 바뀌어요.';
+  document.getElementById('teacher').hidden=true;
+}
+submitBtn.addEventListener('click',async()=>{
+  const n=parseInt(stuNo,10);
+  if(!(n>=1 && n<=99)){ setMsg(submitMsg,'번호를 적어 주세요.','no'); noEl.focus(); return; }
+  if(!who){ setMsg(submitMsg,'이름을 적어 주세요.','no'); whoEl.focus(); return; }
+  const left=picks.filter(x=>!x).length;
+  if(left){ setMsg(submitMsg,'빈칸이 '+left+'개 남았어요. 모두 채운 뒤 제출해요.','no'); return; }
+  const rule = !picks.some((_,b)=>badAt(b));
+  submitBtn.disabled=true; setMsg(submitMsg,'보내는 중…');
+  try{
+    const r = await jsonp(execUrl(classId), {data: JSON.stringify({no:n, name:who, melody:picks.map(k=>BY[k].hg).join(' '), full:true, rule})});
+    if(r && r.ok) setMsg(submitMsg, n+'번 '+who+' 제출 완료! '+(rule?'':'(음 이동 조건을 다시 확인해 보세요)'),'ok');
+    else setMsg(submitMsg,'제출하지 못했어요: '+((r&&r.error)||'알 수 없는 오류'),'no');
+  }catch(e){
+    setMsg(submitMsg,'제출하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 보세요.','no');
+  }finally{ submitBtn.disabled=false; }
+});
+
+/* 선생님 설정 */
+document.getElementById('gsCode').textContent = GS_CODE;
+const gsUrl=document.getElementById('gsUrl'), setupMsg=document.getElementById('setupMsg');
+function idFromUrl(){
+  const v=gsUrl.value.trim();
+  const m=v.match(/\/macros\/s\/([A-Za-z0-9_-]+)\//);
+  return m?m[1]:(/^[A-Za-z0-9_-]{20,}$/.test(v)?v:'');
+}
+function copyText(txt, input, note){
+  const fallback=()=>{ if(input){ input.focus(); input.select(); } setMsg(note,'자동 복사가 안 돼요. 선택된 글을 직접 복사해 주세요.','no'); };
+  try{ navigator.clipboard.writeText(txt).then(()=>setMsg(note,'복사했어요.','ok'),fallback); }catch(e){ fallback(); }
+}
+document.getElementById('copyCode').addEventListener('click',()=>{
+  try{ navigator.clipboard.writeText(GS_CODE).then(()=>setMsg(setupMsg,'코드를 복사했어요. Apps Script에 붙여 넣으세요.','ok'),()=>{}); }catch(e){}
+});
+document.getElementById('testUrl').addEventListener('click',async()=>{
+  const id=idFromUrl();
+  if(!id){ setMsg(setupMsg,'웹 앱 URL을 확인해 주세요. https://script.google.com/macros/s/…/exec 모양이어야 해요.','no'); return; }
+  setMsg(setupMsg,'확인하는 중…');
+  try{
+    const r=await jsonp(execUrl(id),{action:'ping'});
+    if(r&&r.ok) setMsg(setupMsg,'연결됐어요: “'+r.sheet+'” 시트에 기록됩니다.','ok');
+    else setMsg(setupMsg,'시트에 연결했지만 문제가 있어요: '+((r&&r.error)||''),'no');
+  }catch(e){ setMsg(setupMsg,'연결되지 않았어요. 배포할 때 액세스 권한을 ‘모든 사용자’로 했는지 확인해 주세요.','no'); }
+});
+document.getElementById('makeLink').addEventListener('click',()=>{
+  const id=idFromUrl();
+  if(!id){ setMsg(setupMsg,'웹 앱 URL을 먼저 붙여 넣어 주세요.','no'); return; }
+  const link=location.origin+location.pathname+'?c='+id;
+  document.getElementById('classLink').value=link;
+  document.getElementById('classLinkBox').hidden=false;
+  setMsg(setupMsg,'우리 반 링크가 만들어졌어요. 이 링크를 학생들에게 나눠 주세요.','ok');
+});
+document.getElementById('copyLink').addEventListener('click',()=>{
+  const el=document.getElementById('classLink'); copyText(el.value, el, setupMsg);
+});
+
+renderLyrics();
+renderAll();
+})();
+</script>
+</body>
+</html>
