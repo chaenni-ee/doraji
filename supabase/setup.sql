@@ -47,3 +47,14 @@ grant execute on function doraji_list(text,int,int) to anon;
 -- 교사 비밀번호 (따옴표 안만 바꾸세요)
 insert into doraji_settings values ('teacher_password', '여기에_비밀번호')
   on conflict (key) do update set value = excluded.value;
+
+-- 학생이 자기 가락 다시 불러오기: 학년·반·번호·이름이 모두 맞을 때만 그 학생 가락을 돌려줌
+create or replace function doraji_get(p_grade int, p_class int, p_no int, p_name text)
+returns table (melody text, perform text, submitted_at timestamptz)
+language sql security definer set search_path = public as $$
+  select s.melody, s.perform, s.submitted_at from doraji_submissions s
+  where s.grade = p_grade and s.class_no = p_class and s.student_no = p_no
+    and s.name = trim(p_name);
+$$;
+revoke all on function doraji_get(int,int,int,text) from public;
+grant execute on function doraji_get(int,int,int,text) to anon;

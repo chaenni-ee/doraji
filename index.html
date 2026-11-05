@@ -191,6 +191,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
 .me-fields label{display:grid;gap:4px;font-size:14px;font-weight:700;color:var(--muted)}
 .me-fields select,.me-fields input{font:inherit;font-size:17px;padding:8px 10px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%;min-width:0}
 .me-tag{font-size:14px;color:var(--muted)}
+.load-row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.submit-help.left{text-align:left;margin-top:-6px}
 .perform{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
 .perform legend{float:left;font-weight:700;font-size:14px;margin-right:6px}
 .perform label{display:inline-flex;gap:6px;align-items:center;font-size:15px;cursor:pointer}
@@ -269,6 +271,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
       <label for="no">번호<input id="no" type="number" inputmode="numeric" min="1" max="40" placeholder="3" autocomplete="off"></label>
       <label for="who" class="wide">이름<input id="who" type="text" maxlength="20" placeholder="김하늘" autocomplete="off"></label>
     </div>
+    <div class="load-row">
+      <button class="btn" id="loadBtn" type="button">내가 제출한 가락 불러오기</button>
+      <span class="submit-msg" id="loadMsg" role="status"></span>
+    </div>
+    <p class="submit-help left">컴퓨터를 껐다 켰거나 다른 노트북을 쓸 때, 위 정보를 똑같이 적고 누르면 제출했던 가락이 다시 들어와요.</p>
   </section>
 
   <section class="step" aria-labelledby="s1">
@@ -787,6 +794,33 @@ document.addEventListener('keydown',e=>{
     renderAll();
     const el=document.querySelector('#zoom .slot[data-b="'+sel+'"]'); if(el) el.focus();
   }
+});
+
+/* ---------- 제출한 가락 불러오기 ---------- */
+const HG2K = Object.fromEntries(NOTES.map(n=>[n.hg,n.k]));
+const loadBtn=document.getElementById('loadBtn'), loadMsg=document.getElementById('loadMsg');
+loadBtn.addEventListener('click',async()=>{
+  const C = window.DORAJI_CONFIG || {};
+  const n=parseInt(stuNo,10);
+  const say=(t,k)=>{ loadMsg.textContent=t; loadMsg.className='submit-msg'+(k?' '+k:''); };
+  if(!grade||!cls||!(n>=1&&n<=40)||!who){ say('학년, 반, 번호, 이름을 모두 적어 주세요.','no'); return; }
+  loadBtn.disabled=true; say('찾는 중…');
+  try{
+    const res=await fetch(C.url+'/rest/v1/rpc/doraji_get',{method:'POST',
+      headers:{'apikey':C.key,'Content-Type':'application/json'},
+      body:JSON.stringify({p_grade:+grade,p_class:+cls,p_no:n,p_name:who})});
+    if(!res.ok){ say('불러오지 못했어요. 선생님께 알려 주세요. (오류 '+res.status+')','no'); return; }
+    const rows=await res.json();
+    const r=Array.isArray(rows)?rows[0]:null;
+    if(!r){ say('제출한 가락을 찾지 못했어요. 학년·반·번호·이름이 제출할 때와 같은지 확인해 주세요.','no'); return; }
+    const ks=String(r.melody).split(' ').map(h=>HG2K[h]||null);
+    if(ks.length!==N||ks.some(k=>!k)){ say('저장된 가락을 읽지 못했어요.','no'); return; }
+    picks=ks; sel=0;
+    if(r.perform){ perform=r.perform; document.querySelectorAll('input[name="perform"]').forEach(x=>{ x.checked=x.value===perform; }); }
+    save(); renderAll();
+    say('제출했던 가락을 불러왔어요. 아래에서 들어 보고 연습해요.','ok');
+  }catch(e){ say('인터넷 연결을 확인하고 다시 눌러 보세요.','no'); }
+  finally{ loadBtn.disabled=false; }
 });
 
 /* ---------- 제출 (Supabase) ---------- */
