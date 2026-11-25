@@ -851,7 +851,7 @@ submitBtn.addEventListener('click',async()=>{
     if(res.ok) setMsg(submitMsg, grade+'학년 '+cls+'반 '+n+'번 '+who+' 제출 완료!'+(rule?'':' (음 이동 조건을 다시 확인해 보세요)'),'ok');
     else setMsg(submitMsg,'제출하지 못했어요. 선생님께 알려 주세요. (오류 '+res.status+')','no');
   }catch(e){
-    setMsg(submitMsg,'제출하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 보세요.','no');
+    setMsg(submitMsg,'제출하지 못했어요. 인터넷 연결을 확인하고, 계속 안 되면 선생님께 알려 주세요.','no');
   }finally{ submitBtn.disabled=false; }
 });
 

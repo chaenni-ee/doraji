@@ -173,7 +173,7 @@ $('form').addEventListener('submit',async e=>{
     render();
     setMsg(rows.length?rows.length+'명의 기록을 불러왔어요.':'아직 제출한 학생이 없어요.', rows.length?'ok':'');
   }catch(err){
-    setMsg('연결하지 못했어요. 인터넷 연결을 확인해 주세요.','no');
+    setMsg('저장 공간(Supabase)에 연결하지 못했어요. 인터넷이 되는데도 이 메시지가 나오면 Supabase 프로젝트가 일시 정지됐을 수 있어요. Supabase에 로그인해 Restore project를 눌러 주세요.','no');
   }finally{ $('load').disabled=false; }
 });
 
